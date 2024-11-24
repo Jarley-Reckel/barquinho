@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "actuators.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -97,7 +97,21 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  initServo();
+  HAL_Delay(1000);
+  setServoAngle(90);
+  HAL_Delay(1000);
+  setServoRelativeAngle(45, true);
+  HAL_Delay(1000);
+  setServoRelativeAngle(45, false);
+  HAL_Delay(1000);
+  setServoAngle(0);
+  HAL_Delay(1000);
+  setServoAngle(180);
+  HAL_Delay(1000);
+  setServoAngle(90);
+  HAL_Delay(1000);
+  setServoAngle(0);
   /* USER CODE END 2 */
 
   /* Infinite loop */

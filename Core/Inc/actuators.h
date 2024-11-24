@@ -15,25 +15,25 @@
 #define MOTOR_TIMER TIM_CHANNEL_3
 #define SERVO_TIMER TIM_CHANNEL_1
 
-TIM_HandleTypeDef htim_motor;
-TIM_HandleTypeDef htim_servo;
+extern TIM_HandleTypeDef htim_motor;
+extern TIM_HandleTypeDef htim_servo;
 
+uint16_t angle2pulse(uint16_t angle);
 
+void setPWM(TIM_HandleTypeDef timer, uint32_t channel, uint16_t period, uint16_t pulse);
 
-static void setPWM(TIM_HandleTypeDef timer, uint32_t channel, uint16_t period, uint16_t pulse);
+bool initServo();
 
-static bool initServo();
+void setServoAngle(uint16_t angle);
 
-static void setServoAngle(uint16_t angle);
+void setServoRelativeAngle(uint16_t angle, bool clockwise);
 
-static void setServoRelativeAngle(uint16_t angle, bool clockwise);
+bool initMotor();
 
-static bool initMotor();
+void setMotorSpeed(uint16_t speed);
 
-static void setMotorSpeed(uint16_t speed);
+void setMotorAcceleration(uint16_t acceleration);
 
-static void setMotorAcceleration(uint16_t acceleration);
-
-static void setMotorDeceleration(uint16_t deceleration);
+void setMotorDeceleration(uint16_t deceleration);
 
 #endif // __ACTUATORS_H
