@@ -12,7 +12,7 @@
 #define SERVO_INITIAL_PULSE 1500
 #define SERVO_PERIOD 20000
 
-#define MOTOR_TIMER TIM_CHANNEL_
+#define MOTOR_TIMER TIM_CHANNEL_3
 #define SERVO_TIMER TIM_CHANNEL_1
 
 TIM_HandleTypeDef htim_motor;
@@ -22,13 +22,13 @@ TIM_HandleTypeDef htim_servo;
 
 static void setPWM(TIM_HandleTypeDef timer, uint32_t channel, uint16_t period, uint16_t pulse);
 
-static bool initServo(TIM_HandleTypeDef timer, uint32_t channel);
-
-static bool initMotor(TIM_HandleTypeDef timer, uint32_t channel);
+static bool initServo();
 
 static void setServoAngle(uint16_t angle);
 
 static void setServoRelativeAngle(uint16_t angle, bool clockwise);
+
+static bool initMotor();
 
 static void setMotorSpeed(uint16_t speed);
 
