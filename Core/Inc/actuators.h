@@ -15,9 +15,6 @@
 #define MOTOR_TIMER TIM_CHANNEL_3
 #define SERVO_TIMER TIM_CHANNEL_1
 
-extern TIM_HandleTypeDef htim_motor;
-extern TIM_HandleTypeDef htim_servo;
-
 uint16_t angle2pulse(uint16_t angle);
 
 void setPWM(TIM_HandleTypeDef timer, uint32_t channel, uint16_t period, uint16_t pulse);

@@ -1,7 +1,7 @@
 #include "actuators.h"
 
-extern TIM_HandleTypeDef htim_servo;
-extern TIM_HandleTypeDef htim_motor; 
+TIM_HandleTypeDef htim_servo;
+TIM_HandleTypeDef htim_motor; 
 
 uint16_t angle2pulse(uint16_t angle) {
     return SERVO_MIN_PULSE + (angle * (SERVO_MAX_PULSE - SERVO_MIN_PULSE) / 180);
