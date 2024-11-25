@@ -1,0 +1,9 @@
+../Core/Src/actuators.c:6:10:angle2pulse	1
+../Core/Src/actuators.c:10:6:setPWM	1
+../Core/Src/actuators.c:23:6:initServo	6
+../Core/Src/actuators.c:56:6:setServoAngle	1
+../Core/Src/actuators.c:68:6:setServoRelativeAngle	3
+../Core/Src/actuators.c:88:6:initMotor	1
+../Core/Src/actuators.c:102:6:setMotorSpeed	1
+../Core/Src/actuators.c:106:6:setMotorAcceleration	1
+../Core/Src/actuators.c:110:6:setMotorDeceleration	1
