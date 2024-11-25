@@ -36,6 +36,8 @@
 #define SERVO_MAX_PULSE 158
 #define SERVO_INITIAL_PULSE 1500
 #define SERVO_PERIOD 20000
+#define MOTOR_FRENTE 0b10101100
+#define MOTOR_TRAS 0b01010011
 
 #define MOTOR_TIMER TIM_CHANNEL_2
 #define SERVO_TIMER TIM_CHANNEL_1
@@ -77,6 +79,7 @@ void setServoRelativeAngle(uint16_t angle, bool clockwise);
 void setMotorSpeed(uint16_t speed);
 void setMotorAcceleration(uint16_t acceleration);
 void setMotorDeceleration(uint16_t deceleration);
+void sendCommand(unsigned char value, int speed);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -128,16 +131,44 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   bool clockwise = false;
+  int speed = 0;
   setServoAngle(htim4, 90);
+  HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 	  // setPWM(htim4, TIM_CHANNEL_1, SERVO_PERIOD, i);
+
+	speed = 750;
+    sendCommand(0b01010101,speed);
+    for(int i = 0; i <= 180; ++i) {
+      setServoAngle(htim4, i);
+      HAL_Delay(50);
+    }
+    setServoAngle(htim4, 90);
     setServoRelativeAngle(45, clockwise);
     HAL_Delay(1000);
+    speed = 750;
+    sendCommand(0b10101010, speed);
     clockwise = !clockwise;
+    setServoRelativeAngle(45, clockwise);
+    HAL_Delay(1000);
+    setServoRelativeAngle(45, clockwise);
+    HAL_Delay(1000);
+    setServoRelativeAngle(45, clockwise);
+    HAL_Delay(1000);
+    speed = 750;
+    sendCommand(0b10101100, speed);
+    clockwise = !clockwise;
+    setServoRelativeAngle(30, clockwise);
+    HAL_Delay(1000);
+    setServoRelativeAngle(30, clockwise);
+    HAL_Delay(1000);
+    setServoRelativeAngle(30, clockwise);
+    HAL_Delay(1000);
+
 	  // setPWM(htim3, TIM_CHANNEL_2, SERVO_PERIOD, j);
 	  // j += 10;
   // setServoAngle(90);
@@ -515,6 +546,30 @@ void setMotorAcceleration(uint16_t acceleration) {
 
 void setMotorDeceleration(uint16_t deceleration) {
 
+}
+
+void sendCommand(unsigned char value, int speed) {
+  int verify;
+  setPWM(htim3, TIM_CHANNEL_2, 1250, speed);
+  HAL_GPIO_WritePin(GPIOA, L293D_LATCH_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(L293D_CLK_GPIO_Port, L293D_CLK_Pin,   GPIO_PIN_RESET);
+
+  for(unsigned char i=0x0; i<0x08; i++) {
+    HAL_GPIO_WritePin(L293D_CLK_GPIO_Port, L293D_CLK_Pin, GPIO_PIN_RESET);
+
+    if(value & (1<<i)) {
+      verify = GPIO_PIN_SET;
+    } else {
+      verify = GPIO_PIN_RESET;
+    }
+
+    HAL_GPIO_WritePin(GPIOA, L293D_SER_Pin, verify);
+    HAL_GPIO_WritePin(L293D_CLK_GPIO_Port, L293D_CLK_Pin, GPIO_PIN_SET);
+
+  }
+  HAL_GPIO_WritePin(L293D_CLK_GPIO_Port, L293D_CLK_Pin, GPIO_PIN_RESET);
+
+  HAL_GPIO_WritePin(GPIOA, L293D_LATCH_Pin, GPIO_PIN_SET);
 }
 
 
