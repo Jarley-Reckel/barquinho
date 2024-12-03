@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 // #include "actuators.h"
 #include <stdbool.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -80,6 +81,7 @@ void setMotorSpeed(uint16_t speed);
 void setMotorAcceleration(uint16_t acceleration);
 void setMotorDeceleration(uint16_t deceleration);
 void sendCommand(unsigned char value, int speed);
+char serial_print(char *_msg);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -126,6 +128,13 @@ int main(void)
   /* USER CODE BEGIN 2 */
   // initServo();
   HAL_Delay(1000);
+  char temp_msg[30];
+  sprintf(temp_msg, "Hello World!!");
+
+  while (true) {
+	  serial_print(temp_msg);
+	  HAL_Delay(1000);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -570,6 +579,21 @@ void sendCommand(unsigned char value, int speed) {
   HAL_GPIO_WritePin(L293D_CLK_GPIO_Port, L293D_CLK_Pin, GPIO_PIN_RESET);
 
   HAL_GPIO_WritePin(GPIOA, L293D_LATCH_Pin, GPIO_PIN_SET);
+}
+
+int __io_putchar(int ch) {
+	HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+	return ch;
+}
+
+char serial_print(char *_msg) {
+	while (*_msg) {
+		if (__io_putchar(*_msg) != *_msg) {
+			return *_msg;
+		}
+		_msg++;
+	}
+	return ' ';
 }
 
 
