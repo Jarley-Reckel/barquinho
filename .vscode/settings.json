@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "actuators.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "stm32f4xx.h": "c",
+        "hmc5883l.h": "c"
     }
 }

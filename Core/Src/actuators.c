@@ -1,19 +1,5 @@
 #include "actuators.h"
 
-#define SERVO_MIN_PULSE 30
-#define SERVO_MAX_PULSE 158
-#define SERVO_INITIAL_PULSE 1500
-#define SERVO_PERIOD 20000
-#define MOTOR_PERIOD 1250
-#define MOTOR_MAX_SPEED 1250
-#define MOTOR_MIN_SPEED 0
-#define MOTOR_TIMER TIM_CHANNEL_2
-#define SERVO_TIMER TIM_CHANNEL_1
-
-extern TIM_HandleTypeDef htim3;
-extern TIM_HandleTypeDef htim4;
-uint16_t SERVO_ANGLE = 0;
-
 uint16_t angle2pulse(uint16_t angle) {
     return SERVO_MIN_PULSE + (angle * (SERVO_MAX_PULSE - SERVO_MIN_PULSE) / 180.0);
 }
@@ -41,22 +27,28 @@ uint16_t verifySpeed(uint16_t speed) {
     return speed;
 }
 
-void setServoAngle(TIM_HandleTypeDef timer, uint16_t angle) {
+void setServoAngle(boat_system_t *boat_system, TIM_HandleTypeDef timer, uint16_t angle) {
     if(angle < 0) {
         angle = 0;
     } else if(angle > 180) {
         angle = 180;
     }
     uint16_t pulse = angle2pulse(angle);
-    setPWM(htim4, TIM_CHANNEL_1, SERVO_PERIOD, pulse);
-    SERVO_ANGLE = angle;
+
+    setPWM( *boat_system_get_servo_timer(boat_system),
+            boat_system_get_servo_channel(boat_system),
+            SERVO_PERIOD, 
+            pulse);
+
+    boat_system_set_servo_angle(boat_system, angle);
 }
 
-void setServoRelativeAngle(uint16_t angle, bool clockwise) {    
+void setServoRelativeAngle(boat_system_t *boat_system, uint16_t angle, bool clockwise) {  
+    uint16_t current_angle = boat_system_get_servo_angle(boat_system);  
     if(clockwise) {
-        angle = SERVO_ANGLE + angle;
+        angle = current_angle + angle;
     } else {
-        angle = SERVO_ANGLE - angle;
+        angle = current_angle - angle;
     }
     uint16_t pulse = angle2pulse(angle);
 
@@ -65,23 +57,35 @@ void setServoRelativeAngle(uint16_t angle, bool clockwise) {
     } else if(pulse > SERVO_MAX_PULSE) {
         pulse = SERVO_MAX_PULSE;
     }
-    setPWM(htim4, SERVO_TIMER, SERVO_PERIOD, pulse);
-    SERVO_ANGLE = angle;
+
+    setPWM( *boat_system_get_servo_timer(boat_system),
+            boat_system_get_servo_channel(boat_system),
+            SERVO_PERIOD, 
+            pulse);
+
+    boat_system_set_servo_angle(boat_system, angle);
 }
 
-void setMotorSpeed(uint16_t speed) {
+void setMotorSpeed(boat_system_t *boat_system, uint16_t speed) {
     speed = verifySpeed(speed);
-    sendCommand(DIR_DIRECT, speed);
+    sendCommand(boat_system, FORWARD, speed);
+    boat_system_set_motor_speed(boat_system, speed);
+    boat_system_set_motor_direction(boat_system, FORWARD);
 }
 
-void setMotorBackward(uint16_t speed) {
+void setMotorBackward(boat_system_t *boat_system, uint16_t speed) {
     speed = verifySpeed(speed);
-    sendCommand(DIR_REVERSE, speed);
+    sendCommand(boat_system, BACKWARD, speed);
+    boat_system_set_motor_speed(boat_system, speed);
+    boat_system_set_motor_direction(boat_system, BACKWARD);
 }
 
-void sendCommand(unsigned char value, int speed) {
+void sendCommand(boat_system_t *boat_system, unsigned char value, int speed) {
     int verify;
-    setPWM(htim3, TIM_CHANNEL_2, 1250, speed);
+    setPWM( *boat_system_get_motor_timer(boat_system), 
+            boat_system_get_motor_channel(boat_system), 
+            MOTOR_PERIOD, 
+            speed);
     HAL_GPIO_WritePin(GPIOA, L293D_LATCH_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(L293D_CLK_GPIO_Port, L293D_CLK_Pin,   GPIO_PIN_RESET);
 

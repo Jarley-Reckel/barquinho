@@ -3,7 +3,9 @@
   ******************************************************************************
   * @file           : main.c
   * @brief          : Main program body
-  * @authors        : Andre Lamego, Jarley B. Reckel Jr., Mariana Givisiez
+  * @authors        : Andre Lamego (), 
+  *                 : Jarley B. Reckel Jr (jarley@ufmg.br), 
+  *                 : Mariana Givisiez ()
   ******************************************************************************
   * @attention
   *
@@ -25,6 +27,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "actuators.h"
+#include "boat_system.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,8 +67,8 @@ static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_TIM3_Init(void);
 
-char serial_print(char *_msg);
 /* USER CODE BEGIN PFP */
+char serial_print(char *_msg);
 
 /* USER CODE END PFP */
 
@@ -97,7 +100,18 @@ int main(void) {
     SystemClock_Config();
 
     /* USER CODE BEGIN SysInit */
-
+    boat_system_t boat_system;
+    boat_system.htim3 = &htim3;
+    boat_system.htim4 = &htim4;
+    boat_system.huart2 = &huart2;
+    boat_system.huart3 = &huart3;
+    boat_system.hi2c1 = &hi2c1;
+    boat_system.servo_angle = 0;
+    boat_system.servo_channel = TIM_CHANNEL_1;
+    boat_system.servo_timer = &htim4;
+    boat_system.motor_speed = 0;
+    boat_system.motor_channel = TIM_CHANNEL_2;
+    boat_system.motor_timer = &htim3;
     /* USER CODE END SysInit */
 
     /* Initialize all configured peripherals */
@@ -108,64 +122,16 @@ int main(void) {
     MX_USART3_UART_Init();
     MX_TIM3_Init();
     /* USER CODE BEGIN 2 */
-
+    
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
-    bool clockwise = false;
-    int speed = 0;
-    setServoAngle(htim4, 90);
-    HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
     while (1) {
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
-        // setPWM(htim4, TIM_CHANNEL_1, SERVO_PERIOD, i);
 
-        speed = 750;
-        sendCommand(0b01010101,speed);
-        for(int i = 0; i <= 180; ++i) {
-        setServoAngle(htim4, i);
-        HAL_Delay(50);
-        }
-        setServoAngle(htim4, 90);
-        setServoRelativeAngle(45, clockwise);
-        HAL_Delay(1000);
-        speed = 750;
-        sendCommand(0b10101010, speed);
-        clockwise = !clockwise;
-        setServoRelativeAngle(45, clockwise);
-        HAL_Delay(1000);
-        setServoRelativeAngle(45, clockwise);
-        HAL_Delay(1000);
-        setServoRelativeAngle(45, clockwise);
-        HAL_Delay(1000);
-        speed = 750;
-        sendCommand(0b10101100, speed);
-        clockwise = !clockwise;
-        setServoRelativeAngle(30, clockwise);
-        HAL_Delay(1000);
-        setServoRelativeAngle(30, clockwise);
-        HAL_Delay(1000);
-        setServoRelativeAngle(30, clockwise);
-        HAL_Delay(1000);
-
-        // setPWM(htim3, TIM_CHANNEL_2, SERVO_PERIOD, j);
-        // j += 10;
-    // setServoAngle(90);
-    // HAL_Delay(1000);
-    // setServoRelativeAngle(45, true);
-    // HAL_Delay(1000);
-    // setServoRelativeAngle(45, false);
-    // HAL_Delay(1000);
-    // setServoAngle(0);
-    // HAL_Delay(1000);
-    // setServoAngle(180);
-    // HAL_Delay(1000);
-    // setServoAngle(90);
-    // HAL_Delay(1000);
-    // setServoAngle(0);
     }
 /* USER CODE END 3 */
 }

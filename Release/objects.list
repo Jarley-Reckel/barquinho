@@ -1,5 +1,6 @@
 "./Core/Src/HMC5883L.o"
 "./Core/Src/actuators.o"
+"./Core/Src/boat_system.o"
 "./Core/Src/delay.o"
 "./Core/Src/i2c.o"
 "./Core/Src/main.o"
