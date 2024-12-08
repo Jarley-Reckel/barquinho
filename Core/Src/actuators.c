@@ -1,3 +1,16 @@
+/**
+ * @file        : actuators.c
+ * @authors     : Andre Lamego (), 
+ *              : Jarley B. Reckel Jr (jarley@ufmg.br), 
+ *              : Mariana Givisiez ()
+ * @brief       : This file contains the implementation of the functions that control the actuators of the boat.
+ * @version     : 0.1
+ * @date        : 2024-12-08
+ * 
+ * @copyright   : Copyright (c) 2024
+ * 
+ */
+
 #include "actuators.h"
 
 uint16_t angle2pulse(uint16_t angle) {

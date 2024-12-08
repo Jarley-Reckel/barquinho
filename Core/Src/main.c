@@ -68,6 +68,13 @@ static void MX_USART3_UART_Init(void);
 static void MX_TIM3_Init(void);
 
 /* USER CODE BEGIN PFP */
+
+/**
+ * @brief Function to print a message to the serial port
+ * 
+ * @param _msg 
+ * @return char 
+ */
 char serial_print(char *_msg);
 
 /* USER CODE END PFP */
