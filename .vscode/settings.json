@@ -3,6 +3,8 @@
         "actuators.h": "c",
         "main.h": "c",
         "stm32f4xx.h": "c",
-        "hmc5883l.h": "c"
+        "hmc5883l.h": "c",
+        "math.h": "c",
+        "hmc5883l_dev.h": "c"
     }
 }

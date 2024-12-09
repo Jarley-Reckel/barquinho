@@ -19,3 +19,4 @@
 ../Core/Src/HMC5883L_dev.c:339:9:HMC5883L_getIDA	1
 ../Core/Src/HMC5883L_dev.c:346:9:HMC5883L_getIDB	1
 ../Core/Src/HMC5883L_dev.c:353:9:HMC5883L_getIDC	1
+../Core/Src/HMC5883L_dev.c:363:7:HMC588L_getDegree	3

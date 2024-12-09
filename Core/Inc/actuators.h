@@ -1,8 +1,8 @@
 /**
  * @file        : actuators.h
- * @authors     : Andre Lamego (), 
+ * @authors     : Andre Lamego (andrelrc23@ufmg.br), 
  *              : Jarley B. Reckel Jr (jarley@ufmg.br), 
- *              : Mariana Givisiez ()
+ *              : Mariana Givisiez (marianagivisiez@ufmg.br)
  * @brief       : This file contains the declarations of the functions that control the actuators of the boat.
  * @version     : 0.1
  * @date        : 2024-12-08

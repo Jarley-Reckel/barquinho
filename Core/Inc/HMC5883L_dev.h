@@ -36,8 +36,10 @@ THE SOFTWARE.
 #ifndef _HMC5883L_dev_H_
 #define _HMC5883L_dev_H_
 
-#include "I2Cdev.h"
 #include <stdbool.h>
+#include <math.h>
+#include "I2Cdev.h"
+#include "boat_system.h"
 
 #define HMC5883L_ADDRESS            0x1E // this device only has one address
 #define HMC5883L_DEFAULT_ADDRESS    0x1E
@@ -102,6 +104,10 @@ THE SOFTWARE.
 #define HMC5883L_STATUS_LOCK_BIT    1
 #define HMC5883L_STATUS_READY_BIT   0
 
+#define PI                          3.14159265358979323846
+#define DEGREE_CORRECTION           -23
+#define MINUTE_CORRECTION           10
+
 void HMC5883L_initialize();
 bool HMC5883L_testConnection();
 
@@ -135,6 +141,9 @@ bool HMC5883L_getReadyStatus();
 uint8_t HMC5883L_getIDA();
 uint8_t HMC5883L_getIDB();
 uint8_t HMC5883L_getIDC();
+
+//
+float HMC588L_getDegree(boat_system_t *boat_system);
 
 
 #endif /* _HMC5883L_dev_H_ */

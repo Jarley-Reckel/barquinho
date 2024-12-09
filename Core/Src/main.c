@@ -3,9 +3,9 @@
   ******************************************************************************
   * @file           : main.c
   * @brief          : Main program body
-  * @authors        : Andre Lamego (), 
+  * @authors        : Andre Lamego (andrelrc23@ufmg.br), 
   *                 : Jarley B. Reckel Jr (jarley@ufmg.br), 
-  *                 : Mariana Givisiez ()
+  *                 : Mariana Givisiez (marianagivisiez@ufmg.br)
   ******************************************************************************
   * @attention
   *
@@ -141,11 +141,14 @@ int main(void) {
     HMC5883L_testConnection();
     while (1) {
         /* USER CODE END WHILE */
-        char msg[100];
-        sprintf(msg, "x: %d, y: %d\n", HMC5883L_getHeadingX(), HMC5883L_getHeadingY());
-        serial_print(msg);
-        HAL_Delay(1000);
         /* USER CODE BEGIN 3 */
+        char msg[100];
+        float degree = HMC588L_getDegree();
+        sprintf(msg, "Degree: %f\n", degree);
+        serial_print(msg);
+        int16_t servor_angle = (int16_t)((degree + 180)/2);
+        setServoAngle(&boat_system, *boat_system_get_servo_timer(&boat_system), servor_angle);
+        HAL_Delay(10);
 
     }
 /* USER CODE END 3 */

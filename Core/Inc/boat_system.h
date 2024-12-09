@@ -1,8 +1,8 @@
 /**
  * @file        : boat_system.h
- * @authors     : Andre Lamego (), 
+ * @authors     : Andre Lamego (andrelrc23@ufmg.br), 
  *              : Jarley B. Reckel Jr (jarley@ufmg.br), 
- *              : Mariana Givisiez ()
+ *              : Mariana Givisiez (marianagivisiez@ufmg.br)
  * @brief       : This file contains the common defines of the application.
  * @version     : 0.1
  * @date        : 2024-12-08
@@ -37,7 +37,7 @@ typedef struct boat_system {
     UART_HandleTypeDef *huart3;         ///< Handle to the UART3
     I2C_HandleTypeDef *hi2c1;           ///< Handle to the I2C1
 
-    uint16_t servo_angle;               ///< Current angle of the servo
+    int16_t servo_angle;               ///< Current angle of the servo
     uint32_t servo_channel;             ///< Channel of the servo
     TIM_HandleTypeDef *servo_timer;     ///< Handle to the servo timer
 
@@ -48,6 +48,7 @@ typedef struct boat_system {
 
     float x_position;                   ///< Current x position of the boat
     float y_position;                   ///< Current y position of the boat
+    float heading;                      ///< Current heading of the boat
 } boat_system_t;
 
 
@@ -57,7 +58,7 @@ typedef struct boat_system {
  * @param boat_system 
  * @param angle 
  */
-void boat_system_set_servo_angle(boat_system_t *boat_system, uint16_t angle);
+void boat_system_set_servo_angle(boat_system_t *boat_system, int16_t angle);
 
 /**
  * @brief Set the current speed of the motor
@@ -90,6 +91,14 @@ void boat_system_set_x_position(boat_system_t *boat_system, float x_position);
  * @param y_position 
  */
 void boat_system_set_y_position(boat_system_t *boat_system, float y_position);
+
+/**
+ * @brief Set the current heading of the boat
+ * 
+ * @param boat_system 
+ * @param heading 
+ */
+void boat_system_set_heading(boat_system_t *boat_system, float heading);
 
 /**
  * @brief Get the current angle of the servo
@@ -162,5 +171,13 @@ float boat_system_get_x_position(boat_system_t *boat_system);
  * @return float 
  */
 float boat_system_get_y_position(boat_system_t *boat_system);
+
+/**
+ * @brief Get the current heading of the boat
+ * 
+ * @param boat_system 
+ * @return float 
+ */
+float boat_system_get_heading(boat_system_t *boat_system);
 
 #endif // __BOAT_SYSTEM_H

@@ -354,3 +354,28 @@ uint8_t HMC5883L_getIDC() {
     I2Cdev_readByte(devAddr, HMC5883L_RA_ID_C, buffer, 0);
     return buffer[0];
 }
+
+/**
+ * @brief Convert x and y to degree, making the magnetic correction
+ * 
+ * @return float 
+ */
+float HMC588L_getDegree(boat_system_t *boat_system) {
+    int16_t x, y;
+    x = HMC5883L_getHeadingX();
+    y = HMC5883L_getHeadingY();
+    float heading = atan2f(y, x) * 180 / PI;
+    heading += DEGREE_CORRECTION;
+    heading += MINUTE_CORRECTION / 60.0;
+    heading -= 90;
+    
+    if (heading < -180) {
+        heading += 360;
+    }
+    if (heading > 180) {
+        heading -= 360;
+    }
+
+    boat_system_set_heading(boat_system, heading);
+    return heading;
+}
