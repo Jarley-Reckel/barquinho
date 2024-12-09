@@ -1,5 +1,0 @@
-../Core/Src/HMC5883L.c:19:8:HMC5883L_Init	11
-../Core/Src/HMC5883L.c:73:8:update_HMC5883L	1
-../Core/Src/HMC5883L.c:82:7:getGausX	1
-../Core/Src/HMC5883L.c:89:7:getGausY	1
-../Core/Src/HMC5883L.c:96:7:getGausZ	1

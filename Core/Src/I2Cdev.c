@@ -38,7 +38,7 @@ static I2C_HandleTypeDef * I2Cdev_hi2c;
 /** Default timeout value for read operations.
  * Set this to 0 to disable timeout detection.
  */
-uint16_t I2Cdev_readTimeout = I2CDEV_DEFAULT_READ_TIMEOUT;
+// uint16_t I2Cdev_readTimeout = I2CDEV_DEFAULT_READ_TIMEOUT;
 
 /** Sets device handle to use for communications
  * You can call this function and set any other device at any moment
@@ -204,7 +204,7 @@ uint8_t I2Cdev_readWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint1
 uint16_t I2Cdev_writeBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t data)
 {
     uint8_t b;
-    I2Cdev_readByte(devAddr, regAddr, &b, I2Cdev_readTimeout);
+    I2Cdev_readByte(devAddr, regAddr, &b, I2CDEV_DEFAULT_READ_TIMEOUT);
     b = (data != 0) ? (b | (1 << bitNum)) : (b & ~(1 << bitNum));
     return I2Cdev_writeByte(devAddr, regAddr, b);
 }

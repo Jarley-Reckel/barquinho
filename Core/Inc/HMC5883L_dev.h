@@ -33,8 +33,8 @@ THE SOFTWARE.
 ===============================================
 */
 
-#ifndef _HMC5883L_H_
-#define _HMC5883L_H_
+#ifndef _HMC5883L_dev_H_
+#define _HMC5883L_dev_H_
 
 #include "I2Cdev.h"
 #include <stdbool.h>
@@ -137,4 +137,4 @@ uint8_t HMC5883L_getIDB();
 uint8_t HMC5883L_getIDC();
 
 
-#endif /* _HMC5883L_H_ */
+#endif /* _HMC5883L_dev_H_ */

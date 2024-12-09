@@ -27,6 +27,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "actuators.h"
+#include "I2Cdev.h"
+#include "HMC5883L_dev.h"
 #include "boat_system.h"
 /* USER CODE END Includes */
 
@@ -134,9 +136,15 @@ int main(void) {
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
+    I2Cdev_init(&hi2c1);
+    HMC5883L_initialize();
+    HMC5883L_testConnection();
     while (1) {
         /* USER CODE END WHILE */
-
+        char msg[100];
+        sprintf(msg, "x: %d, y: %d\n", HMC5883L_getHeadingX(), HMC5883L_getHeadingY());
+        serial_print(msg);
+        HAL_Delay(1000);
         /* USER CODE BEGIN 3 */
 
     }
