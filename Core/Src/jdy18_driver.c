@@ -10,7 +10,7 @@
  * 
  */
 
-#include "Drivers/jdy18_driver.h"
+#include "jdy18_driver.h"
 
 char *atInstructions[] = {
 	"AT+NAME",
@@ -106,7 +106,7 @@ void JDY18Driver_InquireDevices(UART_HandleTypeDef* huart)
 
 void JDY18Driver_GetScannedDevices(scan_t* scan)
 {
-	*scan = gScan;
+    *scan = gScan;
 }
 
 void JDY18Driver_LoadDeviceInfo(char* start, char* end, device_t* device)

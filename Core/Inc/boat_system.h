@@ -12,6 +12,7 @@
  */
 
 #include "main.h"
+#include "location_service.h"
 
 #ifndef __BOAT_SYSTEM_H
 #define __BOAT_SYSTEM_H
@@ -49,6 +50,8 @@ typedef struct boat_system {
     float x_position;                   ///< Current x position of the boat
     float y_position;                   ///< Current y position of the boat
     float heading;                      ///< Current heading of the boat
+
+    location_t location;           ////< Boat location {latitude, longitude}
 } boat_system_t;
 
 

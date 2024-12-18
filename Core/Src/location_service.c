@@ -10,9 +10,9 @@
  * 
  */
 
-#include "Services/location_service.h"
-#include "Drivers/jdy18_driver.h"
-#include "Services/data_filter_service.h"
+#include "location_service.h"
+#include "jdy18_driver.h"
+#include "data_filter_service.h"
 
 #include <math.h>
 
@@ -60,17 +60,16 @@ void LocationService_Init(UART_HandleTypeDef *huart, TIM_HandleTypeDef* htim)
 
 float LocationService_CalculateDistance(int rssi)
 {
-	return pow(10, ((MEASURED_POWER - rssi) / 20));
+	return pow(10.0, ((MEASURED_POWER - rssi) / 20.0));
 }
 
 void LocationService_UpdateLocation()
 {
 	scan_t scannedDevices;
 	float b1Distance = -1, b2Distance = -1, b3Distance = -1;
+    JDY18Driver_GetScannedDevices(&scannedDevices);
 
-	JDY18Driver_GetScannedDevices(&scannedDevices);
-
-	for(size_t i = 0; i < scannedDevices.size; i++) {
+    for(size_t i = 0; i < scannedDevices.size; i++) {
 		char* deviceName = scannedDevices.devices[i].name;
 		int rssi = scannedDevices.devices[i].rssi;
 
@@ -93,8 +92,9 @@ void LocationService_UpdateLocation()
 
 		masterLocation.longitude = (trilaterationCalcC*trilaterationCalcE - trilaterationCalcF*trilaterationCalcB)/(trilaterationCalcE*trilaterationCalcA - trilaterationCalcB*trilaterationCalcD);
 		masterLocation.latitude= (trilaterationCalcC*trilaterationCalcD - trilaterationCalcA*trilaterationCalcF)/(trilaterationCalcB*trilaterationCalcD - trilaterationCalcA*trilaterationCalcE);
-	}
 
+
+	}
 	JDY18Driver_InquireDevices(bleHandler.huart);
 }
 

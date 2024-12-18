@@ -5,6 +5,7 @@
         "stm32f4xx.h": "c",
         "hmc5883l.h": "c",
         "math.h": "c",
-        "hmc5883l_dev.h": "c"
+        "hmc5883l_dev.h": "c",
+        "location_service.h": "c"
     }
 }

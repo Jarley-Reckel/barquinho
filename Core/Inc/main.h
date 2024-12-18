@@ -34,6 +34,7 @@ extern "C" {
 #include "stdio.h"
 #include "string.h"
 #include "HMC5883L_dev.h"
+#include "location_service.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

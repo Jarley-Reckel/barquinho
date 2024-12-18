@@ -25,6 +25,7 @@
 #define MEASURED_POWER -82
 
 #include "stm32f4xx.h"
+#include "stm32f4xx_hal_uart.h"
 
 typedef struct {
 	float latitude;
