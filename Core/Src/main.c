@@ -31,6 +31,7 @@
 #include "HMC5883L_dev.h"
 #include "boat_system.h"
 #include "location_service.h"
+#include "jdy18_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -141,15 +142,25 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	HAL_Delay(3000);
     char msg[50];
+    scan_t beacons;
     while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-        LocationService_UpdateLocation();
-        boat_system.location = LocationService_GetLocation();
-        sprintf(msg, "Latitude: %f\nLongitude: %f\n\n",boat_system.location.latitude, boat_system.location.longitude);
+        // LocationService_UpdateLocation();
+        // boat_system.location = LocationService_GetLocation();
+        // sprintf(msg, "Latitude: %f\nLongitude: %f\n\n",boat_system.location.latitude, boat_system.location.longitude);
+        // serial_print(msg);
+        // HAL_Delay(500);
+
+        JDY18Driver_InquireDevices(&huart3);
+        JDY18Driver_GetScannedDevices(&beacons);
+        sprintf(msg, "\nNome de dispositivos: ");
         serial_print(msg);
+        sprintf(msg, beacons.devices[0].name);
         HAL_Delay(500);
+        
+
     }
   /* USER CODE END 3 */
 }
