@@ -1,3 +1,4 @@
+"./Core/Src/BLE_JDY_18.o"
 "./Core/Src/HMC5883L_dev.o"
 "./Core/Src/I2Cdev.o"
 "./Core/Src/actuators.o"

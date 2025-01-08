@@ -30,6 +30,7 @@
 #include "I2Cdev.h"
 #include "HMC5883L_dev.h"
 #include "boat_system.h"
+#include "BLE_JDY_18.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,6 +58,7 @@ UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
+SlaveDevice_t slave_list[MAX_SLAVES]; // Lista para armazenar os dispositivos encontrados
 
 /* USER CODE END PV */
 
@@ -132,23 +134,37 @@ int main(void) {
     MX_TIM3_Init();
     /* USER CODE BEGIN 2 */
     
+    char nome[] = "Beacon_Device";
+        char uuid[] = "12345678-1234-5678-1234-567812345678"; // UUID do Beacon
+        int power_pctg = 100; // Potência máxima
+        BLE_setup(&huart3, slave_list, nome, MASTER, BAUD_9600, uuid, power_pctg);
+
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
-    I2Cdev_init(&hi2c1);
-    HMC5883L_initialize();
-    HMC5883L_testConnection();
+//    I2Cdev_init(&hi2c1);
+//    HMC5883L_initialize();
+//    HMC5883L_testConnection();
     while (1) {
         /* USER CODE END WHILE */
         /* USER CODE BEGIN 3 */
-        char msg[100];
-        float degree = HMC588L_getDegree();
-        sprintf(msg, "Degree: %f\n", degree);
-        serial_print(msg);
-        int16_t servor_angle = (int16_t)((degree + 180)/2);
-        setServoAngle(&boat_system, *boat_system_get_servo_timer(&boat_system), servor_angle);
-        HAL_Delay(10);
+//        char msg[100];
+//        float degree = HMC588L_getDegree(&boat_system);
+//        sprintf(msg, "Degree: %f\n", degree);
+//        serial_print(msg);
+//        int16_t servor_angle = (int16_t)((degree + 180)/2);
+//        setServoAngle(&boat_system, *boat_system_get_servo_timer(&boat_system), servor_angle);
+//        HAL_Delay(10);
+        // Inicia a varredura de dispositivos BLE próximos
+        BLE_scan_slaves_and_save(slave_list, MAX_SLAVES);
+
+        // Exibe os dispositivos encontrados
+        for (int i = 0; i < MAX_SLAVES; i++) {
+            char msg[64];
+            snprintf(msg, sizeof(msg), "Dispositivo encontrado: MAC: %s\n", slave_list[i].mac_address);
+            serial_print(msg); // Envia a mensagem via UART
+        }
 
     }
 /* USER CODE END 3 */
