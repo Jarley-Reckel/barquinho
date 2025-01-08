@@ -31,6 +31,7 @@
 #include "HMC5883L_dev.h"
 #include "boat_system.h"
 #include "BLE_JDY_18.h"
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,7 +41,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define CMD_SET_NAME "AT+NAMEbarcomarron\r\n"
+#define CMD_SET_ROLE "AT+ROLE1\r\n"
+#define CMD_SET_IAC "AT+IAC=0x9E8B33\r\n" // General/limited discoverable devices
+#define CMD_SCAN "AT+INQ\r\n"
+#define CMD_RESET "AT+RESET\r\n"
+#define RX_BUFFER_SIZE 256
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,8 +64,9 @@ UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-SlaveDevice_t slave_list[MAX_SLAVES]; // Lista para armazenar os dispositivos encontrados
-volatile char dados_recebidos[BUFFER_SIZE];
+uint8_t rx_buffer[RX_BUFFER_SIZE] = {0}; // Buffer for received data
+uint8_t received_data;                  // Temporary variable for incoming data
+volatile uint8_t rx_index = 0;          // Index for the receive buffer
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -79,6 +86,8 @@ static void MX_TIM3_Init(void);
  * @return char 
  */
 char serial_print(char *_msg);
+void send_command(const char *command);
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 
 /* USER CODE END PFP */
 
@@ -134,13 +143,19 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
     
-  // Habilitar interrupção UART
-  HAL_UART_Receive_IT(&huart3, (uint8_t *)dados_recebidos, BUFFER_SIZE);
+  // Configure the Bluetooth module
+  send_command(CMD_SET_NAME);  // Set Bluetooth name
+  HAL_Delay(500);
+  send_command(CMD_SET_ROLE);  // Set module role to master/slave
+  HAL_Delay(500);
+  send_command(CMD_SET_IAC);   // Set inquiry access code
+  HAL_Delay(500);
+  send_command(CMD_RESET);     // Reset to apply changes
+  HAL_Delay(500);
 
-    char nome[] = "Beacon_Device";
-        char uuid[] = "12345678-1234-5678-1234-567812345678"; // UUID do Beacon
-        int power_pctg = 100; // Potência máxima
-        BLE_setup(&huart3, slave_list, nome, MASTER, BAUD_9600, uuid, power_pctg);
+  // Start receiving data on UART3
+  HAL_UART_Receive_IT(&huart3, &received_data, 1);
+
 
   /* USER CODE END 2 */
 
@@ -153,23 +168,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//        char msg[100];
-//        float degree = HMC588L_getDegree(&boat_system);
-//        sprintf(msg, "Degree: %f\n", degree);
-//        serial_print(msg);
-//        int16_t servor_angle = (int16_t)((degree + 180)/2);
-//        setServoAngle(&boat_system, *boat_system_get_servo_timer(&boat_system), servor_angle);
-//        HAL_Delay(10);
-        // Inicia a varredura de dispositivos BLE próximos
-        BLE_scan_slaves_and_save(slave_list, MAX_SLAVES);
+    	// Scan for nearby Bluetooth devices
+    	send_command(CMD_SCAN);
+    	HAL_Delay(1000); // Wait for scan results
 
-        // Exibe os dispositivos encontrados
-        for (int i = 0; i < MAX_SLAVES; i++) {
-            char msg[64];
-            snprintf(msg, sizeof(msg), "Dispositivo encontrado: MAC: %s\n", slave_list[i].mac_address);
-            serial_print(msg); // Envia a mensagem via UART
-        }
-
+    	// Print received data via UART2 for debugging
+    	if (rx_index > 0) {
+    		//HAL_UART_Transmit(&huart2, rx_buffer, rx_index, HAL_MAX_DELAY);
+    		char msg[64];
+    		snprintf(msg, sizeof(msg), "Dispositivo encontrado: MAC: %s\n", (char*)rx_buffer);
+    		serial_print(msg); // Envia a mensagem via UART// Reset index
+    		memset(rx_buffer, 0, RX_BUFFER_SIZE); // Clear the buffer
+    		rx_index = 0;
+    	}
     }
   /* USER CODE END 3 */
 }
@@ -474,19 +485,19 @@ char serial_print(char *_msg) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    if (huart->Instance == USART3) {  // Verifique se a interrupção foi gerada pela UART correta
-        // Processar os dados recebidos
-    	serial_print("Dados recebidos: ");
-
-        // Imprimir os dados recebidos um por um
-        for (int i = 0; i < BUFFER_SIZE; i++) {
-            serial_print(&dados_recebidos[i]);
+    if (huart->Instance == USART3) { // Handle UART3 data reception
+        if (rx_index < RX_BUFFER_SIZE - 1) {
+            rx_buffer[rx_index++] = received_data; // Append to buffer
         }
-
-        // Re-armazenar a recepção, se necessário, para continuar recebendo dados
-        HAL_UART_Receive_IT(&huart3, (uint8_t *)dados_recebidos, BUFFER_SIZE);
+        HAL_UART_Receive_IT(&huart3, &received_data, 1); // Continue receiving
     }
 }
+
+void send_command(const char *command) {
+    HAL_UART_Transmit(&huart3, (uint8_t *)command, strlen(command), HAL_MAX_DELAY);
+    HAL_Delay(500); // Ensure sufficient time for command execution
+}
+
 
 /* USER CODE END 4 */
 
