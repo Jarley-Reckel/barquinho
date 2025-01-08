@@ -1,5 +1,4 @@
 #include "BLE_JDY_18.h"
-
 UART_HandleTypeDef *huart;
 
 // Prefixos comandos AT

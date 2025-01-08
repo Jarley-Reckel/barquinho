@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -9,6 +10,8 @@
 
 #define MEDIA_MOVEL_JANELA 10
 #define MAX_SLAVES 3
+
+extern volatile char dados_recebidos[BUFFER_SIZE];
 
 typedef enum {
     SLAVE,

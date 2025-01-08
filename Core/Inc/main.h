@@ -85,6 +85,7 @@ void Error_Handler(void);
 #define MAG_SDA_GPIO_Port GPIOB
 #define MAG_SCL_Pin GPIO_PIN_8
 #define MAG_SCL_GPIO_Port GPIOB
+#define BUFFER_SIZE 128
 
 /* USER CODE BEGIN Private defines */
 

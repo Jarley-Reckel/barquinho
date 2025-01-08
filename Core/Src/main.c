@@ -59,7 +59,7 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 SlaveDevice_t slave_list[MAX_SLAVES]; // Lista para armazenar os dispositivos encontrados
-
+volatile char dados_recebidos[BUFFER_SIZE];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -134,6 +134,9 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
     
+  // Habilitar interrupção UART
+  HAL_UART_Receive_IT(&huart3, (uint8_t *)dados_recebidos, BUFFER_SIZE);
+
     char nome[] = "Beacon_Device";
         char uuid[] = "12345678-1234-5678-1234-567812345678"; // UUID do Beacon
         int power_pctg = 100; // Potência máxima
@@ -468,6 +471,21 @@ char serial_print(char *_msg) {
         _msg++;
     }
     return ' ';
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart->Instance == USART3) {  // Verifique se a interrupção foi gerada pela UART correta
+        // Processar os dados recebidos
+    	serial_print("Dados recebidos: ");
+
+        // Imprimir os dados recebidos um por um
+        for (int i = 0; i < BUFFER_SIZE; i++) {
+            serial_print(&dados_recebidos[i]);
+        }
+
+        // Re-armazenar a recepção, se necessário, para continuar recebendo dados
+        HAL_UART_Receive_IT(&huart3, (uint8_t *)dados_recebidos, BUFFER_SIZE);
+    }
 }
 
 /* USER CODE END 4 */
