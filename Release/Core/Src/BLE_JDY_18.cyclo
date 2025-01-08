@@ -1,7 +1,7 @@
 ../Core/Src/BLE_JDY_18.c:51:6:is_MAC_in_list	3
-../Core/Src/BLE_JDY_18.c:90:6:BLE_send_command	1
+../Core/Src/BLE_JDY_18.c:97:6:BLE_send_command	1
 ../Core/Src/BLE_JDY_18.c:21:6:BLE_setup	1
 ../Core/Src/BLE_JDY_18.c:61:6:BLE_scan_slaves_and_save	3
-../Core/Src/BLE_JDY_18.c:84:6:BLE_connect_Master_to_Slave_MAC	1
-../Core/Src/BLE_JDY_18.c:104:6:init_media_movel	1
-../Core/Src/BLE_JDY_18.c:112:5:update_media_movel	1
+../Core/Src/BLE_JDY_18.c:91:6:BLE_connect_Master_to_Slave_MAC	1
+../Core/Src/BLE_JDY_18.c:111:6:init_media_movel	1
+../Core/Src/BLE_JDY_18.c:119:5:update_media_movel	1

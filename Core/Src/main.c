@@ -468,6 +468,8 @@ char serial_print(char *_msg) {
         _msg++;
     }
     return ' ';
+}
+
 /* USER CODE END 4 */
 
 /**

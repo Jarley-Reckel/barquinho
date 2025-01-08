@@ -63,6 +63,13 @@ void BLE_scan_slaves_and_save(SlaveDevice_t *slave_list, int max_slaves) {
     BLE_send_command(AT_COMMAND_SCAN_SLAVES, "");
 
     char dados_recebidos[128];
+    // char *allText = (char *) malloc(1000 * sizeof(char));
+
+    // while(!((strstr(allText, "STOP:SCAN") != NULL))) {
+	// 	HAL_UART_Receive(huart, (uint8_t *) dados_recebidos, 1, HAL_MAX_DELAY);
+	// 	strcat(allText, dados_recebidos);
+	// }
+
     char *mac_ptr = strstr(dados_recebidos, "MAC:");
 
     if (mac_ptr != NULL) {
