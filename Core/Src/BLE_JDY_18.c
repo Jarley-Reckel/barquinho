@@ -10,12 +10,11 @@ const char *at_commands[] = {
     "AT+BAUD=",
     "AT+UUID=",
     "AT+POWER=",
-    "AT+INQ=0x9E8B33",
+    "AT+INQ",
     "AT+CONN",
-	"AT+IAC"
+    "AT+IAC"
     // Add mais prefixos
 };
-
 
 // Função para configurar o JDY-18 com configurações iniciais
 void BLE_setup(UART_HandleTypeDef *huartInt, char *nome, Funcao_t funcao, Baudrate_t baud) {
@@ -44,50 +43,7 @@ void BLE_setup(UART_HandleTypeDef *huartInt, char *nome, Funcao_t funcao, Baudra
     serial_print("hello world");
 }
 
-bool is_MAC_in_list(const SlaveDevice_t *slave_list, const char *mac_to_check) {
-    for (int i = 0; i < MAX_SLAVES; i++) {
-        if (strcmp(slave_list[i].mac_address, mac_to_check) == 0) {
-            return true;
-        }
-    }
-    return false;
-}
-
-void BLE_scan(){
-	BLE_send_command(AT_COMMAND_SCAN_SLAVES, "");
-}
-
 // escaneia por dispositivos BLE próximos e armazena suas informações em uma lista
-void BLE_scan_slaves_and_save(SlaveDevice_t *slave_list, int max_slaves) {
-
-    BLE_send_command(AT_COMMAND_SCAN_SLAVES, "");
-
-    char dados_recebidos[128];
-    // char *allText = (char *) malloc(1000 * sizeof(char));
-
-    // while(!((strstr(allText, "STOP:SCAN") != NULL))) {
-	// 	HAL_UART_Receive(huart, (uint8_t *) dados_recebidos, 1, HAL_MAX_DELAY);
-	// 	strcat(allText, dados_recebidos);
-	// }
-
-    char *mac_ptr = strstr(dados_recebidos, "MAC:");
-
-    if (mac_ptr != NULL) {
-        // Encontrou um pacote válido
-        char mac_address[18];
-        strncpy(mac_address, mac_ptr + 4, 17); // Copia o número MAC
-        mac_address[17] = '\0'; // Adiciona caractere nulo
-        if(is_MAC_in_list(slave_list, mac_address) == false) {
-            strcpy(slave_list[slave_list->topo].mac_address, mac_address); // Salva na lista
-            slave_list->topo++;
-        }
-    }
-    else{
-    	strcpy(slave_list[slave_list->topo].mac_address, "not found");
-    }
-
-}
-
 void BLE_connect_Master_to_Slave_MAC (char *mac) {
 	BLE_send_command(AT_COMMAND_CONECTAR, mac);
 }
@@ -123,4 +79,134 @@ int update_media_movel(MediaMovel_t *media, int new_value) {
     media->valores[media->indice] = new_value;
     media->indice = (media->indice + 1) % MEDIA_MOVEL_JANELA;
     return media->soma / MEDIA_MOVEL_JANELA;
+}
+
+// Função para verificar se um MAC já está na lista de dispositivos
+int find_device_index(Device *devices, int device_count, const char *mac)
+{
+    for (int i = 0; i < device_count; i++)
+    {
+        if (strcmp(devices[i].mac, mac) == 0)
+        {
+            return i; // Retorna o índice do dispositivo encontrado
+        }
+    }
+    return -1; // MAC não encontrado
+}
+
+void parse_devices(const char *input, Device *devices, int *device_count, int scan_id)
+{
+    const char *start = input;
+    const char *current;
+
+    while ((current = strstr(start, "+DEV:")) != NULL)
+    {
+        if (*device_count >= MAX_DEVICES)
+            break;
+
+        // Avançar para o início dos dados do dispositivo
+        current = strchr(current, '=');
+        if (!current)
+            break;
+        current++;
+
+        // Parsear MAC
+        char mac[13];
+        char *mac_end = strchr(current, ',');
+        if (!mac_end || (mac_end - current) > 12)
+        {
+            start = current + 1;
+            continue;
+        }
+        strncpy(mac, current, mac_end - current);
+        mac[mac_end - current] = '\0';
+
+        // Verificar se o MAC é válido
+        if (!is_valid_mac(mac))
+        {
+            start = mac_end + 1;
+            continue;
+        }
+
+        // Parsear RSSI
+        current = mac_end + 1;
+        char *rssi_end = strchr(current, ',');
+        if (!rssi_end)
+        {
+            start = current + 1;
+            continue; // Ignorar dispositivo mal formatado
+        }
+        int rssi = atoi(current);
+
+        // Parsear Nome
+        current = rssi_end + 1;
+        char *name_end = strchr(current, '\n');
+        if (!name_end)
+            name_end = current + strlen(current); // Última linha pode não ter \n
+        char name[MAX_NAME_LEN];
+        strncpy(name, current, name_end - current);
+        name[name_end - current] = '\0';
+
+        // Verificar duplicidade de MAC
+        int index = find_device_index(devices, *device_count, mac);
+        if (index != -1)
+        {
+            // MAC já existe
+            if (devices[index].scan_id == scan_id)
+            {
+                // Mesmo scan: calcular média do RSSI
+                devices[index].rssi = (devices[index].rssi + rssi) / 2;
+            }
+            else
+            {
+                // Novo scan: atualizar RSSI diretamente
+                devices[index].rssi = rssi;
+                devices[index].scan_id = scan_id;
+            }
+        }
+        else
+        {
+            // Novo dispositivo
+            devices[*device_count].scan_id = scan_id;
+            strcpy(devices[*device_count].mac, mac);
+            devices[*device_count].rssi = rssi;
+            strcpy(devices[*device_count].name, name);
+            (*device_count)++;
+        }
+
+        start = name_end;
+    }
+}
+
+// Função para verificar se um MAC é válido (12 caracteres hexadecimais)
+int is_valid_mac(const char *mac)
+{
+    if (strlen(mac) != 12)
+        return 0;
+    for (int i = 0; i < 12; i++)
+    {
+        if (!isxdigit(mac[i]))
+            return 0;
+    }
+    return 1;
+}
+
+// Function to calculate the distance from RSSI
+double rssi_to_distance(int rssi, int A)
+{
+    return pow(10, (A - rssi) / (10 * 2)); // A = potencia à 1m
+}
+
+// Function to find a device by name and calculate its distance
+double get_device_distance(Device *devices, int device_count, const char *device_name, int A) 
+{
+    for (int i = 0; i < device_count; i++)
+    {
+        if (strcmp(devices[i].name, device_name) == 0)
+        {
+            // Device found, calculate and return its distance
+            return rssi_to_distance(devices[i].rssi, A);
+        }
+    }
+    return -1; // Return -1 if device is not found
 }

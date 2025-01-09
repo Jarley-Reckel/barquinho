@@ -10,6 +10,8 @@
 
 #define MEDIA_MOVEL_JANELA 10
 #define MAX_SLAVES 3
+#define MAX_NAME_LEN 50
+#define MAX_DEVICES 10
 
 typedef enum {
     SLAVE,
@@ -32,12 +34,13 @@ typedef enum {
     // Adicionar comandos
 } AtCommands_t;
 
-
-typedef struct {
-    char mac_address[18];
-    int signal_rssi;
-    int topo;
-} SlaveDevice_t;
+typedef struct
+{
+    char mac[13];
+    int rssi;
+    int scan_id; // Último scan no qual o dispositivo foi encontrado
+    char name[MAX_NAME_LEN];
+} Device;
 
 typedef enum {
     BAUD_4800,
@@ -55,13 +58,15 @@ typedef struct {
 } MediaMovel_t;
 
 void BLE_setup(UART_HandleTypeDef *huartInt, char *nome, Funcao_t funcao, Baudrate_t baud);
-void BLE_scan();
-void BLE_scan_slaves_and_save(SlaveDevice_t *slave_list, int max_slaves);
 void BLE_connect_Master_to_Slave_MAC (char *mac);
 void BLE_send_command(AtCommands_t command, char *parameter);
 
 
 void init_media_movel(MediaMovel_t *media);
 int update_media_movel(MediaMovel_t *media, int new_value);
-bool is_MAC_in_list(const SlaveDevice_t *slave_list, const char *mac_to_check);
 
+int find_device_index(Device *devices, int device_count, const char *mac);
+void parse_devices(const char *input, Device *devices, int *device_count, int scan_id);
+int is_valid_mac(const char *mac);
+double rssi_to_distance(int rssi, int A);
+double get_device_distance(Device *devices, int device_count, const char *device_name, int A);

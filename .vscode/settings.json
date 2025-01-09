@@ -5,6 +5,12 @@
         "stm32f4xx.h": "c",
         "hmc5883l.h": "c",
         "math.h": "c",
-        "hmc5883l_dev.h": "c"
+        "hmc5883l_dev.h": "c",
+        "boat_system.h": "c",
+        "stdio.h": "c",
+        "i2cdev.h": "c",
+        "stdbool.h": "c",
+        "ble_jdy_18.h": "c",
+        "string.h": "c"
     }
 }
