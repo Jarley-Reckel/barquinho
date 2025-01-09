@@ -17,37 +17,6 @@ const char *at_commands[] = {
 };
 
 
-//// Função para configurar o JDY-18 com configurações iniciais
-//void BLE_setup(UART_HandleTypeDef *huartInt, SlaveDevice_t *slave_list, char *nome, Funcao_t funcao, Baudrate_t baud, char *uuid, int power_pctg) {
-//	huart = huartInt;
-//	slave_list->topo = 0;
-//
-//	//APP permission Settings, todos habilitados
-//    BLE_send_command(AT_COMMAND_SET_PERMISSIONS, "11111");
-//
-//	// Define o nome do dispositivo
-//    BLE_send_command(AT_COMMAND_DEFINIR_NOME, nome);
-//
-//    // Define a função do dispositivo
-//    char funcao_str[2];
-//    itoa(funcao, funcao_str, 10);
-//    BLE_send_command(AT_COMMAND_DEFINIR_FUNCAO, funcao_str);
-//
-//    // Define a taxa de transmissão (baud rate)
-//    char baud_str[2];
-//    itoa(baud, baud_str, 10);
-//    BLE_send_command(AT_COMMAND_DEFINIR_BAUD, baud_str);
-//
-//    // Define o UUID do Beacon
-//    BLE_send_command(AT_COMMAND_DEFINIR_UUID, uuid);
-//
-//    // Define a potência de transmissão
-//    float power = power_pctg / 100.0;
-//    char power_str[5];
-//    gcvt(power, 2, power_str);
-//    BLE_send_command(AT_COMMAND_DEFINIR_POTENCIA, power_str);
-//}
-
 // Função para configurar o JDY-18 com configurações iniciais
 void BLE_setup(UART_HandleTypeDef *huartInt, char *nome, Funcao_t funcao, Baudrate_t baud) {
 	huart = huartInt;
@@ -71,6 +40,8 @@ void BLE_setup(UART_HandleTypeDef *huartInt, char *nome, Funcao_t funcao, Baudra
     BLE_send_command(AT_COMMAND_IAC, "");
 
     BLE_send_command(AT_COMMAND_RESET, "");
+
+    serial_print("hello world");
 }
 
 bool is_MAC_in_list(const SlaveDevice_t *slave_list, const char *mac_to_check) {

@@ -41,8 +41,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define CMD_SCAN "AT+INQ\r\n"
-#define RX_BUFFER_SIZE 256
+#define RX_BUFFER_SIZE 512
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -157,7 +156,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
     	// Scan for nearby Bluetooth devices
         //BLE_scan();
-    	send_command(CMD_SCAN);
+    	scan();
         HAL_Delay(1000); // Wait for scan results
 
     	// Print received data via UART2 for debugging
@@ -480,7 +479,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         HAL_UART_Receive_IT(&huart3, &received_data, 1); // Continue receiving
     }
 }
-void send_command(const char *command) {
+void scan() {
+	uint8_t command[] = "AT+INQ\r\n";
     HAL_UART_Transmit(&huart3, (uint8_t *)command, strlen(command), HAL_MAX_DELAY);
     HAL_Delay(500); // Ensure sufficient time for command execution
 }
