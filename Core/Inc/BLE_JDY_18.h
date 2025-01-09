@@ -11,8 +11,6 @@
 #define MEDIA_MOVEL_JANELA 10
 #define MAX_SLAVES 3
 
-extern volatile char dados_recebidos[BUFFER_SIZE];
-
 typedef enum {
     SLAVE,
     MASTER,
@@ -30,6 +28,7 @@ typedef enum {
     AT_COMMAND_DEFINIR_POTENCIA,
     AT_COMMAND_SCAN_SLAVES,
     AT_COMMAND_CONECTAR,
+	AT_COMMAND_IAC,
     // Adicionar comandos
 } AtCommands_t;
 
@@ -55,7 +54,8 @@ typedef struct {
     int soma;
 } MediaMovel_t;
 
-void BLE_setup(UART_HandleTypeDef *huartInt, SlaveDevice_t *slave_list, char *nome, Funcao_t funcao, Baudrate_t baud, char *uuid, int power_pctg);
+void BLE_setup(UART_HandleTypeDef *huartInt, char *nome, Funcao_t funcao, Baudrate_t baud);
+void BLE_scan();
 void BLE_scan_slaves_and_save(SlaveDevice_t *slave_list, int max_slaves);
 void BLE_connect_Master_to_Slave_MAC (char *mac);
 void BLE_send_command(AtCommands_t command, char *parameter);

@@ -41,11 +41,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define CMD_SET_NAME "AT+NAMEbarcomarron\r\n"
-#define CMD_SET_ROLE "AT+ROLE1\r\n"
-#define CMD_SET_IAC "AT+IAC=0x9E8B33\r\n" // General/limited discoverable devices
 #define CMD_SCAN "AT+INQ\r\n"
-#define CMD_RESET "AT+RESET\r\n"
 #define RX_BUFFER_SIZE 256
 /* USER CODE END PD */
 
@@ -86,7 +82,6 @@ static void MX_TIM3_Init(void);
  * @return char 
  */
 char serial_print(char *_msg);
-void send_command(const char *command);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 
 /* USER CODE END PFP */
@@ -143,15 +138,9 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
     
-  // Configure the Bluetooth module
-  send_command(CMD_SET_NAME);  // Set Bluetooth name
-  HAL_Delay(500);
-  send_command(CMD_SET_ROLE);  // Set module role to master/slave
-  HAL_Delay(500);
-  send_command(CMD_SET_IAC);   // Set inquiry access code
-  HAL_Delay(500);
-  send_command(CMD_RESET);     // Reset to apply changes
-  HAL_Delay(500);
+   //Configure the Bluetooth module
+  char nome[] = "Barco_vermelho";
+  BLE_setup(&huart3, nome, MASTER, BAUD_9600);
 
   // Start receiving data on UART3
   HAL_UART_Receive_IT(&huart3, &received_data, 1);
@@ -161,16 +150,15 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-//    I2Cdev_init(&hi2c1);
-//    HMC5883L_initialize();
-//    HMC5883L_testConnection();
+
     while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
     	// Scan for nearby Bluetooth devices
+        //BLE_scan();
     	send_command(CMD_SCAN);
-    	HAL_Delay(1000); // Wait for scan results
+        HAL_Delay(1000); // Wait for scan results
 
     	// Print received data via UART2 for debugging
     	if (rx_index > 0) {
@@ -492,7 +480,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         HAL_UART_Receive_IT(&huart3, &received_data, 1); // Continue receiving
     }
 }
-
 void send_command(const char *command) {
     HAL_UART_Transmit(&huart3, (uint8_t *)command, strlen(command), HAL_MAX_DELAY);
     HAL_Delay(500); // Ensure sufficient time for command execution

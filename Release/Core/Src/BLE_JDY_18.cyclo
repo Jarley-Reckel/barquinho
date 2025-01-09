@@ -1,7 +1,8 @@
-../Core/Src/BLE_JDY_18.c:50:6:is_MAC_in_list	3
-../Core/Src/BLE_JDY_18.c:96:6:BLE_send_command	1
-../Core/Src/BLE_JDY_18.c:20:6:BLE_setup	1
-../Core/Src/BLE_JDY_18.c:60:6:BLE_scan_slaves_and_save	3
-../Core/Src/BLE_JDY_18.c:90:6:BLE_connect_Master_to_Slave_MAC	1
-../Core/Src/BLE_JDY_18.c:110:6:init_media_movel	1
-../Core/Src/BLE_JDY_18.c:118:5:update_media_movel	1
+../Core/Src/BLE_JDY_18.c:76:6:is_MAC_in_list	3
+../Core/Src/BLE_JDY_18.c:126:6:BLE_send_command	1
+../Core/Src/BLE_JDY_18.c:52:6:BLE_setup	1
+../Core/Src/BLE_JDY_18.c:85:6:BLE_scan	1
+../Core/Src/BLE_JDY_18.c:90:6:BLE_scan_slaves_and_save	3
+../Core/Src/BLE_JDY_18.c:120:6:BLE_connect_Master_to_Slave_MAC	1
+../Core/Src/BLE_JDY_18.c:141:6:init_media_movel	1
+../Core/Src/BLE_JDY_18.c:149:5:update_media_movel	1
