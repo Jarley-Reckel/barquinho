@@ -1,4 +1,5 @@
 #include "BLE_JDY_18.h"
+#include <ctype.h>
 UART_HandleTypeDef *huart;
 
 // Prefixos comandos AT
@@ -61,7 +62,7 @@ void BLE_send_command(AtCommands_t command, char *parameter) {
     snprintf(complete_command, command_length, "%s%s\r\n", command_prefix, parameter);
 
     // Envia o comando AT para a UART
-    HAL_UART_Transmit(&huart, (uint8_t *)complete_command, strlen(complete_command), HAL_MAX_DELAY);
+    HAL_UART_Transmit(huart, (uint8_t *)complete_command, strlen(complete_command), HAL_MAX_DELAY);
 }
 
 
@@ -92,6 +93,12 @@ int find_device_index(Device *devices, int device_count, const char *mac)
         }
     }
     return -1; // MAC não encontrado
+}
+
+// Função para calcular a média de RSSI
+int calculate_average_rssi(int rssi_sum, int count)
+{
+    return count > 0 ? rssi_sum / count : rssi_sum;
 }
 
 void parse_devices(const char *input, Device *devices, int *device_count, int scan_id)
@@ -140,9 +147,11 @@ void parse_devices(const char *input, Device *devices, int *device_count, int sc
 
         // Parsear Nome
         current = rssi_end + 1;
-        char *name_end = strchr(current, '\n');
+        char *name_end = strchr(current, '+');
         if (!name_end)
-            name_end = current + strlen(current); // Última linha pode não ter \n
+        {
+            name_end = current + strlen(current); // Última linha pode não ter '+'
+        }
         char name[MAX_NAME_LEN];
         strncpy(name, current, name_end - current);
         name[name_end - current] = '\0';
@@ -152,7 +161,7 @@ void parse_devices(const char *input, Device *devices, int *device_count, int sc
         if (index != -1)
         {
             // MAC já existe
-            if (devices[index].scan_id == scan_id)
+            if (devices[index].last_scan_id == scan_id)
             {
                 // Mesmo scan: calcular média do RSSI
                 devices[index].rssi = (devices[index].rssi + rssi) / 2;
@@ -161,19 +170,20 @@ void parse_devices(const char *input, Device *devices, int *device_count, int sc
             {
                 // Novo scan: atualizar RSSI diretamente
                 devices[index].rssi = rssi;
-                devices[index].scan_id = scan_id;
+                devices[index].last_scan_id = scan_id;
             }
         }
         else
         {
             // Novo dispositivo
-            devices[*device_count].scan_id = scan_id;
+            devices[*device_count].last_scan_id = scan_id;
             strcpy(devices[*device_count].mac, mac);
             devices[*device_count].rssi = rssi;
             strcpy(devices[*device_count].name, name);
             (*device_count)++;
         }
 
+        // Atualiza o ponteiro "start" para o próximo dispositivo
         start = name_end;
     }
 }
@@ -192,20 +202,32 @@ int is_valid_mac(const char *mac)
 }
 
 // Function to calculate the distance from RSSI
-double rssi_to_distance(int rssi, int A)
+double rssi_to_distance(int rssi, int rssi_1m)
 {
-    return pow(10, (A - rssi) / (10 * 2)); // A = potencia à 1m
+    return pow(10, (double)(rssi_1m - rssi) / (10 * 2.5) + 0.3);
 }
 
 // Function to find a device by name and calculate its distance
-double get_device_distance(Device *devices, int device_count, const char *device_name, int A) 
+double get_device_distance(Device *devices, int device_count, const char *device_name, int rssi_1m)
 {
     for (int i = 0; i < device_count; i++)
     {
         if (strcmp(devices[i].name, device_name) == 0)
         {
             // Device found, calculate and return its distance
-            return rssi_to_distance(devices[i].rssi, A);
+            return rssi_to_distance(devices[i].rssi, rssi_1m);
+        }
+    }
+    return -1; // Return -1 if device is not found
+}
+
+int get_device_rssi(Device *devices, int device_count, const char *device_name)
+{
+    for (int i = 0; i < device_count; i++)
+    {
+        if (strcmp(devices[i].name, device_name) == 0)
+        {
+            return devices[i].rssi; // Return the RSSI value of the found device
         }
     }
     return -1; // Return -1 if device is not found

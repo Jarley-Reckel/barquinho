@@ -12,6 +12,7 @@
 #define MAX_SLAVES 3
 #define MAX_NAME_LEN 50
 #define MAX_DEVICES 10
+#define MAX_MAC_LEN 13
 
 typedef enum {
     SLAVE,
@@ -38,7 +39,7 @@ typedef struct
 {
     char mac[13];
     int rssi;
-    int scan_id; // Último scan no qual o dispositivo foi encontrado
+    int last_scan_id; // Último scan no qual o dispositivo foi encontrado
     char name[MAX_NAME_LEN];
 } Device;
 
@@ -70,3 +71,5 @@ void parse_devices(const char *input, Device *devices, int *device_count, int sc
 int is_valid_mac(const char *mac);
 double rssi_to_distance(int rssi, int A);
 double get_device_distance(Device *devices, int device_count, const char *device_name, int A);
+int get_device_rssi(Device *devices, int device_count, const char *device_name);
+int calculate_average_rssi(int rssi_sum, int count);

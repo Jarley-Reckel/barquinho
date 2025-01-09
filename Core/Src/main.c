@@ -76,21 +76,22 @@ static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
-void BLE_scan(Device *devices, int *device_count, int scan_id);
+void BLE_scan(Device *devices, int *device_count, int scan_id, char *msg); 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+void scan(void);
 
-/* USER CODE END PFP */
+    /* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
+    /* Private user code ---------------------------------------------------------*/
+    /* USER CODE BEGIN 0 */
 
-/* USER CODE END 0 */
+    /* USER CODE END 0 */
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
+    /**
+     * @brief  The application entry point.
+     * @retval int
+     */
+    int main(void)
 {
 
   /* USER CODE BEGIN 1 */
@@ -136,6 +137,9 @@ int main(void)
   double B1_distance;
   double B2_distance;
   double B3_distance;
+  int B1_rssi;
+  int B2_rssi;
+  int B3_rssi;
   Device devices[MAX_DEVICES];
   int device_count = 0;
   int scan_id = 1;
@@ -157,17 +161,20 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     	// Scan for nearby Bluetooth devices
-        BLE_scan(devices, &device_count, scan_id);
+        BLE_scan(devices, &device_count, scan_id, msg);
         for (int i = 0; i < device_count; i++)
         {
             sprintf(msg, "\nDevice %d : %s", i, devices[i].name);
             serial_print(msg);
         }
         
-        B1_distance = get_device_distance(devices, device_count, "PSE2022_B1", -40);
-        B2_distance = get_device_distance(devices, device_count, "PSE2022_B2", -40);
-        B3_distance = get_device_distance(devices, device_count, "PSE2022_B3", -40);
-        sprintf(msg, "\nB1 distance : %.2f\nB2 distance : %.2f\nB3 distance : %.2f\n", B1_distance, B2_distance, B3_distance);
+        B1_distance = get_device_distance(devices, device_count, "PSE2022_B1", -61);
+        B2_distance = get_device_distance(devices, device_count, "PSE2022_B2", -61);
+        B3_distance = get_device_distance(devices, device_count, "PSE2022_B3", -61);
+        B1_rssi = get_device_rssi(devices, device_count,"PSE2022_B1");
+        B2_rssi = get_device_rssi(devices, device_count,"PSE2022_B2");
+        B3_rssi = get_device_rssi(devices, device_count,"PSE2022_B3");
+        sprintf(msg, "\nB1 distance : %.2f \t B1 RSSI: %d\nB2 distance : %.2f \t B2 RSSI: %d\nB3 distance : %.2f \t B3 RSSI: %d\n", B1_distance, B1_rssi, B2_distance, B2_rssi, B3_distance, B3_rssi);
         serial_print(msg);
     }
   /* USER CODE END 3 */
@@ -458,16 +465,15 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void BLE_scan(Device *devices, int *device_count, int scan_id)
+void BLE_scan(Device *devices, int *device_count, int scan_id, char *msg)
 {
-    send_command(CMD_SCAN);
-    HAL_Delay(1000); // Wait for scan results
-
+    scan(); 
     // Print received data via UART2 for debugging
     if (rx_index > 0)
     {
-        // HAL_UART_Transmit(&huart2, rx_buffer, rx_index, HAL_MAX_DELAY);
-        parse_devices(rx_buffer, devices, &device_count, scan_id);
+        snprintf(msg, RX_BUFFER_SIZE, "Dispositivo encontrado: MAC: %s\n", (char *)rx_buffer);
+        serial_print(msg); // Envia a mensagem via UART// Reset index
+        parse_devices(rx_buffer, devices, device_count, scan_id);
         scan_id++;
         memset(rx_buffer, 0, RX_BUFFER_SIZE); // Clear the buffer
         rx_index = 0;
@@ -497,10 +503,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         HAL_UART_Receive_IT(&huart3, &received_data, 1); // Continue receiving
     }
 }
-void scan() {
+void scan() 
+{
 	uint8_t command[] = "AT+INQ\r\n";
     HAL_UART_Transmit(&huart3, (uint8_t *)command, strlen(command), HAL_MAX_DELAY);
-    HAL_Delay(500); // Ensure sufficient time for command execution
+    HAL_Delay(1000); // Ensure sufficient time for command execution
 }
 
 
