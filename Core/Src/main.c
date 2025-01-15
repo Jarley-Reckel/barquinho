@@ -30,7 +30,7 @@
 #include "I2Cdev.h"
 #include "HMC5883L_dev.h"
 #include "boat_system.h"
-#include "BLE_JDY_18.h"
+#include "location_service.h"
 #include <string.h>
 /* USER CODE END Includes */
 
@@ -150,8 +150,8 @@ void scan(void);
   // Start receiving data on UART3
   HAL_UART_Receive_IT(&huart3, &received_data, 1);
 
-  MediaMovel_t media_movel;
-  init_media_movel(&media_movel);
+  Moving_avg_t media_movel;
+  init_moving_average(&media_movel);
   int media;
 
   /* USER CODE END 2 */

@@ -11,6 +11,12 @@
         "i2cdev.h": "c",
         "stdbool.h": "c",
         "ble_jdy_18.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "system_error": "c",
+        "array": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c"
     }
 }
