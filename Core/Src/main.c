@@ -25,13 +25,14 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
+#include <string.h>
 #include <stdio.h>
+#include "tools_and_types.h"
 #include "actuators.h"
 #include "I2Cdev.h"
 #include "HMC5883L_dev.h"
 #include "boat_system.h"
 #include "location_service.h"
-#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -111,18 +112,24 @@ void scan(void);
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-    boat_system_t boat_system;
-    boat_system.htim3 = &htim3;
-    boat_system.htim4 = &htim4;
-    boat_system.huart2 = &huart2;
-    boat_system.huart3 = &huart3;
-    boat_system.hi2c1 = &hi2c1;
-    boat_system.servo_angle = 0;
-    boat_system.servo_channel = TIM_CHANNEL_1;
-    boat_system.servo_timer = &htim4;
-    boat_system.motor_speed = 0;
-    boat_system.motor_channel = TIM_CHANNEL_2;
-    boat_system.motor_timer = &htim3;
+    Boat_system_t bs;
+    bs.name = "Barco_vermelho";
+    bs.function = MASTER;
+    bs.hi2c1 = &hi2c1;
+    bs.servo_angle = 0;
+    bs.servo_channel = TIM_CHANNEL_1;
+    bs.servo_timer = &htim4;
+    bs.motor_speed = 0;
+    bs.motor_direction = FORWARD;
+    bs.motor_channel = TIM_CHANNEL_2;
+    bs.motor_timer = &htim3;
+    bs.x_position = 0;
+    bs.y_position = 0;
+    bs.heading = 0;
+    bs.BLE_huart = &huart3;
+    bs.BLE_baud = BAUD_9600;
+    bs.device_count = 0;
+    bs.rssi_reference = -61;
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */

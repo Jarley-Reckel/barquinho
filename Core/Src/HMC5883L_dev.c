@@ -360,7 +360,7 @@ uint8_t HMC5883L_getIDC() {
  * 
  * @return float 
  */
-float HMC588L_getDegree(boat_system_t *boat_system) {
+float HMC588L_getDegree(Boat_system_t *boat_system) {
     int16_t x, y;
     x = HMC5883L_getHeadingX();
     y = HMC5883L_getHeadingY();

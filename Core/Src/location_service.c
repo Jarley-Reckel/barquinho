@@ -28,7 +28,7 @@ const char *at_commands[] = {
     "AT+IAC"
 };
 
-void BLE_setup(UART_HandleTypeDef *huartInt, char *name, Funcao_t device_function, Baudrate_t baud) {
+void BLE_setup(UART_HandleTypeDef *huartInt, char *name, Function_t device_function, Baudrate_t baud) {
 	huart = huartInt;
 
     BLE_send_command(AT_COMMAND_SET_PERMISSIONS, "11111");

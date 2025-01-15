@@ -52,7 +52,7 @@ void setPWM(TIM_HandleTypeDef timer, uint32_t channel, uint16_t period, uint16_t
  * @param value 
  * @param speed 
  */
-void sendCommand(boat_system_t *boat_system, unsigned char value, int speed);
+void sendCommand(Boat_system_t *boat_system, unsigned char value, int speed);
 
 /**
  * @brief Verify if the speed is within the limits
@@ -70,7 +70,7 @@ uint16_t verifySpeed(uint16_t speed);
  * @param timer 
  * @param angle 
  */
-void setServoAngle(boat_system_t *boat_system, TIM_HandleTypeDef timer, uint16_t angle);
+void setServoAngle(Boat_system_t *boat_system, TIM_HandleTypeDef timer, uint16_t angle);
 
 /**
  * @brief Set the relative angle of the servo
@@ -79,7 +79,7 @@ void setServoAngle(boat_system_t *boat_system, TIM_HandleTypeDef timer, uint16_t
  * @param angle 
  * @param clockwise 
  */
-void setServoRelativeAngle(boat_system_t *boat_system, uint16_t angle, bool clockwise);
+void setServoRelativeAngle(Boat_system_t *boat_system, uint16_t angle, bool clockwise);
 
 /**
  * @brief Set the speed of the motor
@@ -87,7 +87,7 @@ void setServoRelativeAngle(boat_system_t *boat_system, uint16_t angle, bool cloc
  * @param boat_system 
  * @param speed 
  */
-void setMotorSpeed(boat_system_t *boat_system, uint16_t speed);
+void setMotorSpeed(Boat_system_t *boat_system, uint16_t speed);
 
 /**
  * @brief Set the speed of the motor in the backward direction
@@ -95,7 +95,7 @@ void setMotorSpeed(boat_system_t *boat_system, uint16_t speed);
  * @param boat_system 
  * @param speed 
  */
-void setMotorBackward(boat_system_t *boat_system, uint16_t speed);
+void setMotorBackward(Boat_system_t *boat_system, uint16_t speed);
 
 
 #endif // __ACTUATORS__H__

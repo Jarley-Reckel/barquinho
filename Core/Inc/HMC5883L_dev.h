@@ -143,7 +143,7 @@ uint8_t HMC5883L_getIDB();
 uint8_t HMC5883L_getIDC();
 
 //
-float HMC588L_getDegree(boat_system_t *boat_system);
+float HMC588L_getDegree(Boat_system_t *boat_system);
 
 
 #endif /* _HMC5883L_dev_H_ */

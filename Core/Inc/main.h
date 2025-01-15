@@ -57,13 +57,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-/**
- * @brief Function to print a message to the serial port
- *
- * @param _msg
- * @return char
- */
-char serial_print(char *_msg);
+
 
 /* USER CODE END EFP */
 

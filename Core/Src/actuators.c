@@ -40,7 +40,7 @@ uint16_t verifySpeed(uint16_t speed) {
     return speed;
 }
 
-void setServoAngle(boat_system_t *boat_system, TIM_HandleTypeDef timer, uint16_t angle) {
+void setServoAngle(Boat_system_t *boat_system, TIM_HandleTypeDef timer, uint16_t angle) {
     if(angle < 0) {
         angle = 0;
     } else if(angle > 180) {
@@ -56,7 +56,7 @@ void setServoAngle(boat_system_t *boat_system, TIM_HandleTypeDef timer, uint16_t
     boat_system_set_servo_angle(boat_system, angle);
 }
 
-void setServoRelativeAngle(boat_system_t *boat_system, uint16_t angle, bool clockwise) {  
+void setServoRelativeAngle(Boat_system_t *boat_system, uint16_t angle, bool clockwise) {  
     uint16_t current_angle = boat_system_get_servo_angle(boat_system);  
     if(clockwise) {
         angle = current_angle + angle;
@@ -79,21 +79,21 @@ void setServoRelativeAngle(boat_system_t *boat_system, uint16_t angle, bool cloc
     boat_system_set_servo_angle(boat_system, angle);
 }
 
-void setMotorSpeed(boat_system_t *boat_system, uint16_t speed) {
+void setMotorSpeed(Boat_system_t *boat_system, uint16_t speed) {
     speed = verifySpeed(speed);
     sendCommand(boat_system, FORWARD, speed);
     boat_system_set_motor_speed(boat_system, speed);
     boat_system_set_motor_direction(boat_system, FORWARD);
 }
 
-void setMotorBackward(boat_system_t *boat_system, uint16_t speed) {
+void setMotorBackward(Boat_system_t *boat_system, uint16_t speed) {
     speed = verifySpeed(speed);
     sendCommand(boat_system, BACKWARD, speed);
     boat_system_set_motor_speed(boat_system, speed);
     boat_system_set_motor_direction(boat_system, BACKWARD);
 }
 
-void sendCommand(boat_system_t *boat_system, unsigned char value, int speed) {
+void sendCommand(Boat_system_t *boat_system, unsigned char value, int speed) {
     int verify;
     setPWM( *boat_system_get_motor_timer(boat_system), 
             boat_system_get_motor_channel(boat_system), 
