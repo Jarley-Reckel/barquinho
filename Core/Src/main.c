@@ -150,6 +150,9 @@ void scan(void);
   // Start receiving data on UART3
   HAL_UART_Receive_IT(&huart3, &received_data, 1);
 
+  MediaMovel_t media_movel;
+  init_media_movel(&media_movel);
+  int media;
 
   /* USER CODE END 2 */
 
@@ -176,6 +179,10 @@ void scan(void);
         B3_rssi = get_device_rssi(devices, device_count,"PSE2022_B3");
         sprintf(msg, "\nB1 distance : %.2f \t B1 RSSI: %d\nB2 distance : %.2f \t B2 RSSI: %d\nB3 distance : %.2f \t B3 RSSI: %d\n", B1_distance, B1_rssi, B2_distance, B2_rssi, B3_distance, B3_rssi);
         serial_print(msg);
+        media = update_media_movel(&media_movel,B1_rssi);
+        sprintf(msg, "\nMedia %d \n", media);
+        serial_print(msg);
+
     }
   /* USER CODE END 3 */
 }
