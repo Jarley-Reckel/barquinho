@@ -21,6 +21,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -37,7 +38,11 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef struct 
+{
+    uint32_t x;
+    uint32_t y;
+} location_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -62,7 +67,15 @@ TIM_HandleTypeDef htim4;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
+osThreadId controlTaskHandle;
+osThreadId bleTaskHandle;
+osThreadId magTaskHandle;
+osMessageQId locationQueueHandle;
+osMessageQId magQueueHandle;
 /* USER CODE BEGIN PV */
+osPoolDef(location_pool, 1, location_t);
+osPoolId(location_pool_id);
+
 uint8_t rx_buffer[RX_BUFFER_SIZE] = {0}; // Buffer for received data
 uint8_t received_data;                  // Temporary variable for incoming data
 volatile uint8_t rx_index = 0;          // Index for the receive buffer
@@ -76,23 +89,27 @@ static void MX_TIM4_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_TIM3_Init(void);
+void StartControlTask(void const * argument);
+void StartTaskBLE(void const * argument);
+void StartTaskMag(void const * argument);
+
 /* USER CODE BEGIN PFP */
 void BLE_scan(Device *devices, int *device_count, int scan_id, char *msg); 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void scan(void);
 
-    /* USER CODE END PFP */
+/* USER CODE END PFP */
 
-    /* Private user code ---------------------------------------------------------*/
-    /* USER CODE BEGIN 0 */
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 
-    /* USER CODE END 0 */
+/* USER CODE END 0 */
 
-    /**
-     * @brief  The application entry point.
-     * @retval int
-     */
-    int main(void)
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
 {
 
   /* USER CODE BEGIN 1 */
@@ -163,6 +180,53 @@ void scan(void);
 
   /* USER CODE END 2 */
 
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* definition and creation of locationQueue */
+  osMessageQDef(locationQueue, 1, location_t);
+  locationQueueHandle = osMessageCreate(osMessageQ(locationQueue), NULL);
+
+  /* definition and creation of magQueue */
+  osMessageQDef(magQueue, 1, uint16_t);
+  magQueueHandle = osMessageCreate(osMessageQ(magQueue), NULL);
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* definition and creation of controlTask */
+  osThreadDef(controlTask, StartControlTask, osPriorityNormal, 0, 128);
+  controlTaskHandle = osThreadCreate(osThread(controlTask), NULL);
+
+  /* definition and creation of bleTask */
+  osThreadDef(bleTask, StartTaskBLE, osPriorityAboveNormal, 0, 128);
+  bleTaskHandle = osThreadCreate(osThread(bleTask), NULL);
+
+  /* definition and creation of magTask */
+  osThreadDef(magTask, StartTaskMag, osPriorityAboveNormal, 0, 128);
+  magTaskHandle = osThreadCreate(osThread(magTask), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
@@ -171,25 +235,6 @@ void scan(void);
 
     /* USER CODE BEGIN 3 */
     	// Scan for nearby Bluetooth devices
-        BLE_scan(devices, &device_count, scan_id, msg);
-        for (int i = 0; i < device_count; i++)
-        {
-            sprintf(msg, "\nDevice %d : %s", i, devices[i].name);
-            serial_print(msg);
-        }
-        
-        B1_distance = get_device_distance(devices, device_count, "PSE2022_B1", -61);
-        B2_distance = get_device_distance(devices, device_count, "PSE2022_B2", -61);
-        B3_distance = get_device_distance(devices, device_count, "PSE2022_B3", -61);
-        B1_rssi = get_device_rssi(devices, device_count,"PSE2022_B1");
-        B2_rssi = get_device_rssi(devices, device_count,"PSE2022_B2");
-        B3_rssi = get_device_rssi(devices, device_count,"PSE2022_B3");
-        sprintf(msg, "\nB1 distance : %.2f \t B1 RSSI: %d\nB2 distance : %.2f \t B2 RSSI: %d\nB3 distance : %.2f \t B3 RSSI: %d\n", B1_distance, B1_rssi, B2_distance, B2_rssi, B3_distance, B3_rssi);
-        serial_print(msg);
-        media = update_media_movel(&media_movel,B1_rssi);
-        sprintf(msg, "\nMedia %d \n", media);
-        serial_print(msg);
-
     }
   /* USER CODE END 3 */
 }
@@ -517,6 +562,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         HAL_UART_Receive_IT(&huart3, &received_data, 1); // Continue receiving
     }
 }
+
 void scan() 
 {
 	uint8_t command[] = "AT+INQ\r\n";
@@ -526,6 +572,88 @@ void scan()
 
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_StartControlTask */
+/**
+  * @brief  Function implementing the controlTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartControlTask */
+void StartControlTask(void const * argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_StartTaskBLE */
+/**
+* @brief Function implementing the bleTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskBLE */
+void StartTaskBLE(void const * argument)
+{
+  /* USER CODE BEGIN StartTaskBLE */
+  location_t *location_data;
+  uint32_t i=0;
+
+  location_pool_id = osPoolCreate(osPool(location_pool));
+  location_data = (location_t *) osPoolAlloc(location_pool_id);
+  /* Infinite loop */
+  for(;;)
+  {
+
+    osMessagePut(locationQueueHandle, (uint32_t) location_data, osWaitForever);
+    osDelay(10);
+  }
+  /* USER CODE END StartTaskBLE */
+}
+
+/* USER CODE BEGIN Header_StartTaskMag */
+/**
+* @brief Function implementing the magTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTaskMag */
+void StartTaskMag(void const * argument)
+{
+  /* USER CODE BEGIN StartTaskMag */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartTaskMag */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
