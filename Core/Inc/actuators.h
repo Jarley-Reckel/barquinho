@@ -26,6 +26,7 @@
 #define MOTOR_PERIOD 1250           ///< Period of the motor
 #define MOTOR_MAX_SPEED 1250        ///< Maximum speed of the motor
 #define MOTOR_MIN_SPEED 0           ///< Minimum speed of the motor
+#define DESACELERATION 50           ///< Desaceleration of the motor
 
 /**
  * @brief Convert an angle to the corresponding pulse

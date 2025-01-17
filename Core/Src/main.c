@@ -21,7 +21,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -67,15 +66,7 @@ TIM_HandleTypeDef htim4;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
-osThreadId controlTaskHandle;
-osThreadId bleTaskHandle;
-osThreadId magTaskHandle;
-osMessageQId locationQueueHandle;
-osMessageQId magQueueHandle;
 /* USER CODE BEGIN PV */
-osPoolDef(location_pool, 1, location_t);
-osPoolId(location_pool_id);
-
 uint8_t rx_buffer[RX_BUFFER_SIZE] = {0}; // Buffer for received data
 uint8_t received_data;                  // Temporary variable for incoming data
 volatile uint8_t rx_index = 0;          // Index for the receive buffer
@@ -89,10 +80,6 @@ static void MX_TIM4_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_TIM3_Init(void);
-void StartControlTask(void const * argument);
-void StartTaskBLE(void const * argument);
-void StartTaskMag(void const * argument);
-
 /* USER CODE BEGIN PFP */
 void BLE_scan(Device *devices, int *device_count, int scan_id, char *msg); 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
@@ -129,34 +116,40 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-    Boat_system_t bs;
-    bs.name = "Barco_vermelho";
-    bs.function = MASTER;
-    bs.hi2c1 = &hi2c1;
-    bs.servo_angle = 0;
-    bs.servo_channel = TIM_CHANNEL_1;
-    bs.servo_timer = &htim4;
-    bs.motor_speed = 0;
-    bs.motor_direction = FORWARD;
-    bs.motor_channel = TIM_CHANNEL_2;
-    bs.motor_timer = &htim3;
-    bs.x_position = 0;
-    bs.y_position = 0;
-    bs.heading = 0;
-    bs.BLE_huart = &huart3;
-    bs.BLE_baud = BAUD_9600;
-    bs.device_count = 0;
-    bs.rssi_reference = -61;
+  Boat_system_t bs;
+  bs.name = "Barco_vermelho";
+  bs.function = MASTER;
+  bs.hi2c1 = &hi2c1;
+  bs.servo_angle = 0;
+  bs.servo_channel = TIM_CHANNEL_1;
+  bs.servo_timer = &htim4;
+  bs.motor_speed = 0;
+  bs.motor_direction = FORWARD;
+  bs.motor_channel = TIM_CHANNEL_2;
+  bs.motor_timer = &htim3;
+  bs.x_position = 0;
+  bs.y_position = 0;
+  bs.heading = 0;
+  bs.BLE_huart = &huart3;
+  bs.BLE_baud = BAUD_9600;
+  bs.device_count = 0;
+  bs.rssi_reference = -61;
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
+  MX_TIM3_Init();
   MX_TIM4_Init();
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
-  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+
+  I2Cdev_init(&hi2c1);
+  HMC5883L_initialize();
+  BLE_setup(bs.BLE_huart, bs.name, bs.function, bs.BLE_baud);
+  HMC5883L_testConnection();
+
   char msg[RX_BUFFER_SIZE];
   double B1_distance;
   double B2_distance;
@@ -164,77 +157,53 @@ int main(void)
   int B1_rssi;
   int B2_rssi;
   int B3_rssi;
-  Device devices[MAX_DEVICES];
-  int device_count = 0;
   int scan_id = 1;
-  // Configure the Bluetooth module
-  char nome[] = "Barco_vermelho";
-  BLE_setup(&huart3, nome, MASTER, BAUD_9600);
 
-  // Start receiving data on UART3
-  HAL_UART_Receive_IT(&huart3, &received_data, 1);
-
-  Moving_avg_t media_movel;
-  init_moving_average(&media_movel);
+  init_moving_average(&bs.rssi_avg);
   int media;
 
   /* USER CODE END 2 */
 
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
-
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
-
-  /* Create the queue(s) */
-  /* definition and creation of locationQueue */
-  osMessageQDef(locationQueue, 1, location_t);
-  locationQueueHandle = osMessageCreate(osMessageQ(locationQueue), NULL);
-
-  /* definition and creation of magQueue */
-  osMessageQDef(magQueue, 1, uint16_t);
-  magQueueHandle = osMessageCreate(osMessageQ(magQueue), NULL);
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
-
-  /* Create the thread(s) */
-  /* definition and creation of controlTask */
-  osThreadDef(controlTask, StartControlTask, osPriorityNormal, 0, 128);
-  controlTaskHandle = osThreadCreate(osThread(controlTask), NULL);
-
-  /* definition and creation of bleTask */
-  osThreadDef(bleTask, StartTaskBLE, osPriorityAboveNormal, 0, 128);
-  bleTaskHandle = osThreadCreate(osThread(bleTask), NULL);
-
-  /* definition and creation of magTask */
-  osThreadDef(magTask, StartTaskMag, osPriorityAboveNormal, 0, 128);
-  magTaskHandle = osThreadCreate(osThread(magTask), NULL);
-
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
-
-  /* Start scheduler */
-  osKernelStart();
-
-  /* We should never get here as control is now taken by the scheduler */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
+    sendCommand(&bs, FORWARD, MOTOR_MAX_SPEED);
+    bs.motor_speed = MOTOR_MAX_SPEED;
     while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    	// Scan for nearby Bluetooth devices
+    	BLE_scan(bs.devices, bs.device_count, scan_id, msg);
+      for (int i = 0; i < bs.device_count; ++i) {
+        sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
+        serial_print(msg);
+      }
+      B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", -61);
+      B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", -61);
+      B3_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B3", -61);
+      B1_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B1");
+      B2_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B2");
+      B3_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B3");
+      sprintf(msg, "\nB1 distance : %.2f \t B1 RSSI: %d\nB2 distance : %.2f \t B2 RSSI: %d\nB3 distance : %.2f \t B3 RSSI: %d\n", B1_distance, B1_rssi, B2_distance, B2_rssi, B3_distance, B3_rssi);
+      serial_print(msg);
+      media = update_media_movel(&bs.rssi_avg, B1_rssi);
+      sprintf(msg, "\nMedia %d \n", media);
+      serial_print(msg);
+
+      update_boat_position(&bs, B1_distance, B2_distance, B3_distance);
+      update_servor_angle(&bs);
+      setServoAngle(&bs, *bs.servo_timer, bs.servo_angle);
+
+      if (distance < limit) {
+        if (bs.motor_speed > MOTOR_MIN_SPEED) {
+          bs.motor_speed -= DESACELERATION;
+          sendCommand(&bs, FORWARD, bs.motor_speed);
+        }
+        HAL_Delay(100);
+      } else {
+        HAL_Delay(1000);
+      }
+      
     }
   /* USER CODE END 3 */
 }
@@ -572,88 +541,6 @@ void scan()
 
 
 /* USER CODE END 4 */
-
-/* USER CODE BEGIN Header_StartControlTask */
-/**
-  * @brief  Function implementing the controlTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_StartControlTask */
-void StartControlTask(void const * argument)
-{
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_StartTaskBLE */
-/**
-* @brief Function implementing the bleTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTaskBLE */
-void StartTaskBLE(void const * argument)
-{
-  /* USER CODE BEGIN StartTaskBLE */
-  location_t *location_data;
-  uint32_t i=0;
-
-  location_pool_id = osPoolCreate(osPool(location_pool));
-  location_data = (location_t *) osPoolAlloc(location_pool_id);
-  /* Infinite loop */
-  for(;;)
-  {
-
-    osMessagePut(locationQueueHandle, (uint32_t) location_data, osWaitForever);
-    osDelay(10);
-  }
-  /* USER CODE END StartTaskBLE */
-}
-
-/* USER CODE BEGIN Header_StartTaskMag */
-/**
-* @brief Function implementing the magTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTaskMag */
-void StartTaskMag(void const * argument)
-{
-  /* USER CODE BEGIN StartTaskMag */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartTaskMag */
-}
-
-/**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM1 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  /* USER CODE BEGIN Callback 0 */
-
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM1) {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
-
-  /* USER CODE END Callback 1 */
-}
 
 /**
   * @brief  This function is executed in case of error occurrence.

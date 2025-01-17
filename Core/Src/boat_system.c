@@ -96,3 +96,24 @@ int boat_system_get_number_of_devices(Boat_system_t *boat_system) {
 int boat_system_get_rssi_reference(Boat_system_t *boat_system) {
     return boat_system->rssi_reference;
 }
+
+/**
+ * Implementar a seguinte lógica:
+ * Pegar a posição dos beacons e a posição do barco, com isso definir o ângulo do servo.
+ * O angulo do servo deve ser aquele que leva o barco para a posição de linha reta com a chegada.
+ * Dever ter uma declaração estática que define de forma imediata uma posição para o servo,
+ * posteriormente, a cada chamada da função, o servo deve ser movido de forma a se aproximar da posição
+ * de linha reta com a chegada, ou seja, o servo deve ser movido de forma a minimizar o erro entre a
+ * posição do barco e a posição de linha reta com a chegada.
+ * O parâmetro pass representa o incremento do ângulo do servo, se pass = 1, o incremento é grosseiro,
+ * se pass = 0, o incremento é fino. Isso é definito pela distância entre o barco e a chegada.
+ */
+void update_servor_angle(Boat_system_t *boat_system, int8_t pass) {
+    
+    if (pass == 1) { // incremento grosseiro
+        boat_system->servo_angle += 10;
+    } else { // incremento fino
+        boat_system->servo_angle -= 1;
+    }
+
+}

@@ -202,3 +202,23 @@ int get_device_rssi(Device *devices, int device_count, const char *device_name) 
     }
     return -1;
 }
+
+void update_boat_position(Boat_system_t *bs, double B1_distance, double B2_distance, double B3_distance) {
+    
+    // Coordenadas fixas dos beacons
+    double x1 = 0.0, y1 = 0.0;   // Beacon 1
+    double x2 = 10.0, y2 = 0.0;  // Beacon 2
+    double x3 = 5.0, y3 = 8.66;  // Beacon 3
+
+    // Cálculo da posição usando trilateração
+    double A = 2 * (x2 - x1);
+    double B = 2 * (y2 - y1);
+    double C = B1_distance * B1_distance - B2_distance * B2_distance - x1 * x1 + x2 * x2 - y1 * y1 + y2 * y2;
+
+    double D = 2 * (x3 - x2);
+    double E = 2 * (y3 - y2);
+    double F = B2_distance * B2_distance - B3_distance * B3_distance - x2 * x2 + x3 * x3 - y2 * y2 + y3 * y3;
+
+    bs->x_position = (C * E - F * B) / (A * E - B * D);
+    bs->y_position = (C * D - A * F) / (B * D - A * E);
+}

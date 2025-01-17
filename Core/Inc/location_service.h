@@ -24,6 +24,7 @@
 
 #include "main.h"
 #include "tools_and_types.h"
+#include "boat_system.h"
 
 /**
  * @brief Function to set up the JDY-18 module
@@ -133,6 +134,15 @@ double get_device_distance(Device *devices, int device_count, const char *device
  */
 int get_device_rssi(Device *devices, int device_count, const char *device_name);
 
+/**
+ * @brief This function use the distances to the devices to calculate the new position of the boat
+ * 
+ * @param bs            Pointer to the boat system
+ * @param B1_distance   Distance to device B1
+ * @param B2_distance   Distance to device B2
+ * @param B3_distance   Distance to device B3
+ */
+void update_boat_position(Boat_system_t *bs, double B1_distance, double B2_distance, double B3_distance);
 
 
 
