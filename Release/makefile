@@ -60,8 +60,8 @@ all: main-build
 main-build: barquinho.elf secondary-outputs
 
 # Tool invocations
-barquinho.elf barquinho.map: $(OBJS) $(USER_OBJS) E:\ufmg\ 2024-2\embarcados\barquinho\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "barquinho.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"E:\ufmg 2024-2\embarcados\barquinho\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="barquinho.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+barquinho.elf barquinho.map: $(OBJS) $(USER_OBJS) C:\Users\jarle\STM32CubeIDE\workspace_1.16.2\barquinho\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "barquinho.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\jarle\STM32CubeIDE\workspace_1.16.2\barquinho\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="barquinho.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

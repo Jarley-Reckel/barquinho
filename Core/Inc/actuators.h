@@ -103,7 +103,7 @@ void setMotorBackward(Boat_system_t *boat_system, uint16_t speed);
  * 
  * @param boat_system 
  */
-void update_servor_angle(Boat_system_t *boat_system, int16_t destiny, uint16_t angle);
+void update_servor_angle(Boat_system_t *boat_system, int16_t destiny_y, int16_t destiny_x, double angle);
 
 
 #endif // __ACTUATORS__H__

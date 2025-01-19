@@ -130,11 +130,10 @@ void sendCommand(Boat_system_t *boat_system, unsigned char value, int speed) {
  * O parâmetro pass representa o incremento do ângulo do servo, se pass = 1, o incremento é grosseiro,
  * se pass = 0, o incremento é fino. Isso é definito pela distância entre o barco e a chegada.
  */
-void update_servor_angle(Boat_system_t *boat_system, int16_t destiny_y, int16_t destiny_x, uint16_t angle) {
+void update_servor_angle(Boat_system_t *boat_system, int16_t destiny_y, int16_t destiny_x, double angle) {
     int16_t current_angle = boat_system_get_servo_angle(boat_system);
-    int16_t boat_x = boat_system_get_x(boat_system);
-    int16_t boat_y = boat_system_get_y(boat_system);
-    int16_t heading = boat_system_get_heading(boat_system);
+    int16_t boat_x = boat_system_get_x_position(boat_system);
+    int16_t boat_y = boat_system_get_y_position(boat_system);
 
     int16_t new_angle = atan2(destiny_y - boat_y, destiny_x - boat_x) * 180 / PI;
     if (abs(new_angle - angle) < abs(current_angle - angle)) {

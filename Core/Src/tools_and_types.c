@@ -13,6 +13,8 @@
 
 #include "tools_and_types.h"
 
+UART_HandleTypeDef *serial_huart; // Pointer to the serial port handler
+
 void init_serial(UART_HandleTypeDef *huart) {
     serial_huart = huart;
 }

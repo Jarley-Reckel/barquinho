@@ -107,8 +107,6 @@ typedef struct {
     int sum;                    ///< Sum of the values
 } Moving_avg_t;
 
-static UART_HandleTypeDef *serial_huart; // Pointer to the serial port handler
-
 /**
  * @brief Set the handler for the serial port
  * 

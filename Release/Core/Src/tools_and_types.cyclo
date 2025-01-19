@@ -1,0 +1,3 @@
+../Core/Src/tools_and_types.c:18:6:init_serial	1
+../Core/Src/tools_and_types.c:22:5:__io_putchar	1
+../Core/Src/tools_and_types.c:27:6:serial_print	3

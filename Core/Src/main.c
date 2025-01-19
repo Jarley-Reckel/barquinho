@@ -170,19 +170,18 @@ int main(void)
     sendCommand(&bs, FORWARD, MOTOR_MAX_SPEED);
     bs.motor_speed = MOTOR_MAX_SPEED;
     setServoAngle(&bs, 90);
-    Pass_t pass = THICK;
     int16_t aux_y =  B3_Y + (B3_Y - B2_Y) / 2;
     int16_t limit = abs(B1_X - B2_X) / 2;
     int16_t limit_line = abs(B1_X - B2_X) / LIMIT_LINE_FACTOR;
     int16_t limit_hard = abs(B1_X - B2_X) / HARD_LIMIT_FACTOR;
     int16_t distance_x = 0;
     int16_t distance_y = 0;
-    int16_t final_angle = atan2(B3_Y - B2_Y, B3_X - B2_X) * (180.0 / PI);
+    double final_angle = atan2(B3_Y - B2_Y, B3_X - B2_X) * (180.0 / PI);
     while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    	BLE_scan(bs.devices, bs.device_count, scan_id, msg);
+    	BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
       for (int i = 0; i < bs.device_count; ++i) {
         sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
         serial_print(msg);
@@ -196,11 +195,10 @@ int main(void)
       B3_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B3");
       sprintf(msg, "\nB1 distance : %.2f \t B1 RSSI: %d\nB2 distance : %.2f \t B2 RSSI: %d\nB3 distance : %.2f \t B3 RSSI: %d\n", B1_distance, B1_rssi, B2_distance, B2_rssi, B3_distance, B3_rssi);
       serial_print(msg);
-      media = update_media_movel(&bs.rssi_avg, B1_rssi);
+      media = update_moving_average(&bs.rssi_avg, B1_rssi);
       sprintf(msg, "\nMedia %d \n", media);
       serial_print(msg);
       if (distance_y < limit_line) {
-        pass = THIN;
         if(B2_distance < limit_hard) {
           if (bs.motor_speed > MOTOR_MIN_SPEED) {
             bs.motor_speed -= DESACELERATION;
@@ -217,7 +215,7 @@ int main(void)
       update_boat_position(&bs, B1_distance, B2_distance, B3_distance);
       distance_x = abs(B1_X - bs.x_position);
       distance_y = abs(B1_Y - bs.y_position);
-      update_servor_angle(&bs, aux_y, B3_X, DESTINY_DIRECTION);
+      update_servor_angle(&bs, aux_y, B3_X, (double)DESTINY_DIRECTION);
       if (distance_x < limit) {
         aux_y = aux_y + (aux_y - B2_Y) / 2;
         limit = -1;
@@ -521,27 +519,27 @@ void BLE_scan(Device *devices, int *device_count, int scan_id, char *msg)
     {
         snprintf(msg, RX_BUFFER_SIZE, "Dispositivo encontrado: MAC: %s\n", (char *)rx_buffer);
         serial_print(msg); // Envia a mensagem via UART// Reset index
-        parse_devices(rx_buffer, devices, device_count, scan_id);
+        parse_devices((char *)rx_buffer, devices, device_count, scan_id);
         scan_id++;
         memset(rx_buffer, 0, RX_BUFFER_SIZE); // Clear the buffer
         rx_index = 0;
     }
 }
 
-int __io_putchar(int ch) {
-    HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
-    return ch;
-}
+// int __io_putchar(int ch) {
+//     HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+//     return ch;
+// }
 
-char serial_print(char *_msg) {
-    while (*_msg) {
-        if (__io_putchar(*_msg) != *_msg) {
-            return *_msg;
-        }
-        _msg++;
-    }
-    return ' ';
-}
+// char serial_print(char *_msg) {
+//     while (*_msg) {
+//         if (__io_putchar(*_msg) != *_msg) {
+//             return *_msg;
+//         }
+//         _msg++;
+//     }
+//     return ' ';
+// }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart->Instance == USART3) { // Handle UART3 data reception

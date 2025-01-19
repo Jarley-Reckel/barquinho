@@ -1,0 +1,4 @@
+../Core/Src/boat_tasks.c:16:6:boat_task_control	1
+../Core/Src/boat_tasks.c:20:6:boat_task_location	1
+../Core/Src/boat_tasks.c:24:6:boat_task_motor	1
+../Core/Src/boat_tasks.c:28:6:boat_task_servo	1
