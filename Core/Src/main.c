@@ -167,7 +167,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     sprintf(msg, "Inicializando Barco Vermelho!!\n");
-    sendCommand(&bs, FORWARD, MOTOR_MAX_SPEED);
+    serial_print(msg);
     bs.motor_speed = MOTOR_MAX_SPEED;
     for (int angle = 0; angle <= 180; angle += 10) {
       setServoAngle(&bs, angle);
@@ -178,6 +178,17 @@ int main(void)
       HAL_Delay(100);
     }
     setServoAngle(&bs, 90);
+
+    while (bs.device_count < 3) {
+      BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
+      HAL_Delay(100);
+    }
+    for (int i = 0; i < bs.device_count; ++i) {
+      sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
+      serial_print(msg);
+    }
+    
+
     int16_t aux_y =  B3_Y + (B3_Y - B2_Y) / 2;
     int16_t limit = abs(B1_X - B2_X) / 2;
     int16_t limit_line = abs(B1_X - B2_X) / LIMIT_LINE_FACTOR;
@@ -185,15 +196,11 @@ int main(void)
     int16_t distance_x = 0;
     int16_t distance_y = 0;
     double final_angle = atan2(B3_Y - B2_Y, B3_X - B2_X) * (180.0 / PI);
+    sendCommand(&bs, FORWARD, MOTOR_MAX_SPEED);
     while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    	BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
-      for (int i = 0; i < bs.device_count; ++i) {
-        sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
-        serial_print(msg);
-      }
       HMC588L_getDegree(&bs);
       B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", B1_RSSI_1M);
       B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", B2_RSSI_1M);

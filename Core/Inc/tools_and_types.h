@@ -114,6 +114,15 @@ typedef struct {
  */
 void init_serial(UART_HandleTypeDef *huart);
 
+
+/**
+ * @brief Function to print a character to the serial port
+ * 
+ * @param ch 
+ * @return int 
+ */
+int __io_putchar(int ch);
+
 /**
  * @brief Function to print a message to the serial port
  *
