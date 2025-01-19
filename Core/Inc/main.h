@@ -88,7 +88,7 @@ void Error_Handler(void);
 #define MAG_SCL_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-
+int __io_putchar(int ch);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

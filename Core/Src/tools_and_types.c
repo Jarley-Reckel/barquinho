@@ -19,7 +19,7 @@ void init_serial(UART_HandleTypeDef *huart) {
     serial_huart = huart;
 }
 
-int __io_putchar(int ch) {
+extern int __io_putchar(int ch) {
     HAL_UART_Transmit(serial_huart, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
     return ch;
 }

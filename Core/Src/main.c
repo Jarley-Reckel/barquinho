@@ -567,7 +567,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 void scan() 
 {
-	uint8_t command[] = "AT+INQ\r\n";
+	char command[] = "AT+INQ\r\n";
     HAL_UART_Transmit(&huart3, (uint8_t *)command, strlen(command), HAL_MAX_DELAY);
     HAL_Delay(1000); // Ensure sufficient time for command execution
 }
