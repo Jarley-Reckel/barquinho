@@ -179,10 +179,12 @@ int main(void)
     }
     setServoAngle(&bs, 90);
 
-    while (bs.device_count < 3) {
-      BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
-      HAL_Delay(100);
-    }
+    sprintf(msg, "Escanegando dispositivos!!\n");
+    serial_print(msg);
+    // while (bs.device_count < 3) {
+    BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
+    HAL_Delay(100);
+    // }
     for (int i = 0; i < bs.device_count; ++i) {
       sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
       serial_print(msg);
