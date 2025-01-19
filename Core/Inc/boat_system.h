@@ -226,11 +226,6 @@ int boat_system_get_number_of_devices(Boat_system_t *boat_system);
  */
 int boat_system_get_rssi_reference(Boat_system_t *boat_system);
 
-/**
- * @brief Construct a new update servor angle object
- * 
- * @param boat_system 
- */
-void update_servor_angle(Boat_system_t *boat_system);
+
 
 #endif // __BOAT_SYSTEM_H

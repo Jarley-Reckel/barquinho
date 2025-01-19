@@ -40,7 +40,7 @@ uint16_t verifySpeed(uint16_t speed) {
     return speed;
 }
 
-void setServoAngle(Boat_system_t *boat_system, TIM_HandleTypeDef timer, uint16_t angle) {
+void setServoAngle(Boat_system_t *boat_system, uint16_t angle) {
     if(angle < 0) {
         angle = 0;
     } else if(angle > 180) {
@@ -117,4 +117,30 @@ void sendCommand(Boat_system_t *boat_system, unsigned char value, int speed) {
     }
     HAL_GPIO_WritePin(L293D_CLK_GPIO_Port, L293D_CLK_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOA, L293D_LATCH_Pin, GPIO_PIN_SET);
+}
+
+/**
+ * Implementar a seguinte lógica:
+ * Pegar a posição dos beacons e a posição do barco, com isso definir o ângulo do servo.
+ * O angulo do servo deve ser aquele que leva o barco para a posição de linha reta com a chegada.
+ * Dever ter uma declaração estática que define de forma imediata uma posição para o servo,
+ * posteriormente, a cada chamada da função, o servo deve ser movido de forma a se aproximar da posição
+ * de linha reta com a chegada, ou seja, o servo deve ser movido de forma a minimizar o erro entre a
+ * posição do barco e a posição de linha reta com a chegada.
+ * O parâmetro pass representa o incremento do ângulo do servo, se pass = 1, o incremento é grosseiro,
+ * se pass = 0, o incremento é fino. Isso é definito pela distância entre o barco e a chegada.
+ */
+void update_servor_angle(Boat_system_t *boat_system, int16_t destiny_y, int16_t destiny_x, uint16_t angle) {
+    int16_t current_angle = boat_system_get_servo_angle(boat_system);
+    int16_t boat_x = boat_system_get_x(boat_system);
+    int16_t boat_y = boat_system_get_y(boat_system);
+    int16_t heading = boat_system_get_heading(boat_system);
+
+    int16_t new_angle = atan2(destiny_y - boat_y, destiny_x - boat_x) * 180 / PI;
+    if (abs(new_angle - angle) < abs(current_angle - angle)) {
+        setServoAngle(boat_system, new_angle);
+    } else {
+        // Tratar caso que o barco desvia de se ajustar para o sul
+        setServoAngle(boat_system, angle);
+    }
 }

@@ -169,6 +169,15 @@ int main(void)
 
     sendCommand(&bs, FORWARD, MOTOR_MAX_SPEED);
     bs.motor_speed = MOTOR_MAX_SPEED;
+    setServoAngle(&bs, 90);
+    Pass_t pass = THICK;
+    int16_t aux_y =  B3_Y + (B3_Y - B2_Y) / 2;
+    int16_t limit = abs(B1_X - B2_X) / 2;
+    int16_t limit_line = abs(B1_X - B2_X) / LIMIT_LINE_FACTOR;
+    int16_t limit_hard = abs(B1_X - B2_X) / HARD_LIMIT_FACTOR;
+    int16_t distance_x = 0;
+    int16_t distance_y = 0;
+    int16_t final_angle = atan2(B3_Y - B2_Y, B3_X - B2_X) * (180.0 / PI);
     while (1) {
     /* USER CODE END WHILE */
 
@@ -178,6 +187,7 @@ int main(void)
         sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
         serial_print(msg);
       }
+      HMC588L_getDegree(&bs);
       B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", -61);
       B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", -61);
       B3_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B3", -61);
@@ -189,20 +199,33 @@ int main(void)
       media = update_media_movel(&bs.rssi_avg, B1_rssi);
       sprintf(msg, "\nMedia %d \n", media);
       serial_print(msg);
+      if (distance_y < limit_line) {
+        pass = THIN;
+        if(B2_distance < limit_hard) {
+          if (bs.motor_speed > MOTOR_MIN_SPEED) {
+            bs.motor_speed -= DESACELERATION;
+            sendCommand(&bs, FORWARD, bs.motor_speed);
+            HAL_Delay(100);
+            continue;
+          }
+        }
+        update_servor_angle(&bs, B3_Y, B3_X, final_angle);
+        HAL_Delay(100);
+        continue;
+      }
 
       update_boat_position(&bs, B1_distance, B2_distance, B3_distance);
-      update_servor_angle(&bs);
-      setServoAngle(&bs, *bs.servo_timer, bs.servo_angle);
-
-      if (distance < limit) {
-        if (bs.motor_speed > MOTOR_MIN_SPEED) {
-          bs.motor_speed -= DESACELERATION;
-          sendCommand(&bs, FORWARD, bs.motor_speed);
-        }
-        HAL_Delay(100);
-      } else {
-        HAL_Delay(1000);
+      distance_x = abs(B1_X - bs.x_position);
+      distance_y = abs(B1_Y - bs.y_position);
+      update_servor_angle(&bs, aux_y, B3_X, DESTINY_DIRECTION);
+      if (distance_x < limit) {
+        aux_y = aux_y + (aux_y - B2_Y) / 2;
+        limit = -1;
       }
+      setServoAngle(&bs, DESTINY_DIRECTION);
+      HAL_Delay(1000);
+
+
       
     }
   /* USER CODE END 3 */

@@ -71,7 +71,7 @@ uint16_t verifySpeed(uint16_t speed);
  * @param timer 
  * @param angle 
  */
-void setServoAngle(Boat_system_t *boat_system, TIM_HandleTypeDef timer, uint16_t angle);
+void setServoAngle(Boat_system_t *boat_system, uint16_t angle);
 
 /**
  * @brief Set the relative angle of the servo
@@ -97,6 +97,13 @@ void setMotorSpeed(Boat_system_t *boat_system, uint16_t speed);
  * @param speed 
  */
 void setMotorBackward(Boat_system_t *boat_system, uint16_t speed);
+
+/**
+ * @brief Construct a new update servor angle object
+ * 
+ * @param boat_system 
+ */
+void update_servor_angle(Boat_system_t *boat_system, int16_t destiny, uint16_t angle);
 
 
 #endif // __ACTUATORS__H__
