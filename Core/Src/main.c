@@ -166,9 +166,17 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
+    sprintf(msg, "Inicializando Barco Vermelho!!\n");
     sendCommand(&bs, FORWARD, MOTOR_MAX_SPEED);
     bs.motor_speed = MOTOR_MAX_SPEED;
+    for (int angle = 0; angle <= 180; angle += 10) {
+      setServoAngle(&bs, angle);
+      HAL_Delay(100);
+    }
+    for (int angle = 180; angle >= 0; angle -= 10) {
+      setServoAngle(&bs, angle);
+      HAL_Delay(100);
+    }
     setServoAngle(&bs, 90);
     int16_t aux_y =  B3_Y + (B3_Y - B2_Y) / 2;
     int16_t limit = abs(B1_X - B2_X) / 2;
