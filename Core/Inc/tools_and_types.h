@@ -32,6 +32,9 @@
 #define DESTINY_DIRECTION 180                  ///< Angle of the destiny line
 #define LIMIT_LINE_FACTOR 10
 #define HARD_LIMIT_FACTOR 12
+#define B1_RSSI_1M -61          ///< RSSI reference value at 1 meter for device B1
+#define B2_RSSI_1M -61          ///< RSSI reference value at 1 meter for device B2
+#define B3_RSSI_1M -61          ///< RSSI reference value at 1 meter for device B3
 
 /**
  * @brief Enumeration of the possible functions of the JDY-18 module

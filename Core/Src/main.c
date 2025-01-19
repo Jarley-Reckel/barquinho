@@ -188,9 +188,9 @@ int main(void)
         serial_print(msg);
       }
       HMC588L_getDegree(&bs);
-      B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", -61);
-      B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", -61);
-      B3_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B3", -61);
+      B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", B1_RSSI_1M);
+      B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", B2_RSSI_1M);
+      B3_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B3", B3_RSSI_1M);
       B1_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B1");
       B2_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B2");
       B3_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B3");
@@ -224,9 +224,6 @@ int main(void)
       }
       setServoAngle(&bs, DESTINY_DIRECTION);
       HAL_Delay(1000);
-
-
-      
     }
   /* USER CODE END 3 */
 }
