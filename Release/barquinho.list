@@ -3203,16 +3203,16 @@ Disassembly of section .text:
 
 08002384 <__io_putchar>:
  8002384:	b507      	push	{r0, r1, r2, lr}
- 8002386:	f04f 33ff 	mov.w	r3, #4294967295
- 800238a:	9001      	str	r0, [sp, #4]
- 800238c:	2201      	movs	r2, #1
- 800238e:	a901      	add	r1, sp, #4
- 8002390:	4803      	ldr	r0, [pc, #12]	@ (80023a0 <__io_putchar+0x1c>)
- 8002392:	f001 fd9e 	bl	8003ed2 <HAL_UART_Transmit>
- 8002396:	9801      	ldr	r0, [sp, #4]
- 8002398:	b003      	add	sp, #12
- 800239a:	f85d fb04 	ldr.w	pc, [sp], #4
- 800239e:	bf00      	nop
+ 8002386:	9001      	str	r0, [sp, #4]
+ 8002388:	4805      	ldr	r0, [pc, #20]	@ (80023a0 <__io_putchar+0x1c>)
+ 800238a:	f04f 33ff 	mov.w	r3, #4294967295
+ 800238e:	2201      	movs	r2, #1
+ 8002390:	a901      	add	r1, sp, #4
+ 8002392:	6800      	ldr	r0, [r0, #0]
+ 8002394:	f001 fd9d 	bl	8003ed2 <HAL_UART_Transmit>
+ 8002398:	9801      	ldr	r0, [sp, #4]
+ 800239a:	b003      	add	sp, #12
+ 800239c:	f85d fb04 	ldr.w	pc, [sp], #4
  80023a0:	200005b8 	.word	0x200005b8
 
 080023a4 <serial_print>:
