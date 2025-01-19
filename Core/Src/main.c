@@ -203,6 +203,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+      BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
       HMC588L_getDegree(&bs);
       B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", B1_RSSI_1M);
       B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", B2_RSSI_1M);
