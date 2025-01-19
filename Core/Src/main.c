@@ -541,20 +541,20 @@ void BLE_scan(Device *devices, int *device_count, int scan_id, char *msg)
     }
 }
 
-// int __io_putchar(int ch) {
-//     HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
-//     return ch;
-// }
+int __io_putchar(int ch) {
+    HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+    return ch;
+}
 
-// char serial_print(char *_msg) {
-//     while (*_msg) {
-//         if (__io_putchar(*_msg) != *_msg) {
-//             return *_msg;
-//         }
-//         _msg++;
-//     }
-//     return ' ';
-// }
+char serial_print(char *_msg) {
+    while (*_msg) {
+        if (__io_putchar(*_msg) != *_msg) {
+            return *_msg;
+        }
+        _msg++;
+    }
+    return ' ';
+}
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart->Instance == USART3) { // Handle UART3 data reception

@@ -13,23 +13,23 @@
 
 #include "tools_and_types.h"
 
-UART_HandleTypeDef *serial_huart; // Pointer to the serial port handler
+// UART_HandleTypeDef *serial_huart; // Pointer to the serial port handler
 
-void init_serial(UART_HandleTypeDef *huart) {
-    serial_huart = huart;
-}
+// void init_serial(UART_HandleTypeDef *huart) {
+//     serial_huart = huart;
+// }
 
-extern int __io_putchar(int ch) {
-    HAL_UART_Transmit(serial_huart, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
-    return ch;
-}
+// extern int __io_putchar(int ch) {
+//     HAL_UART_Transmit(serial_huart, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+//     return ch;
+// }
 
-char serial_print(char *_msg) {
-    while (*_msg) {
-        if (__io_putchar(*_msg) != *_msg) {
-            return *_msg;
-        }
-        _msg++;
-    }
-    return ' ';
-}
+// char serial_print(char *_msg) {
+//     while (*_msg) {
+//         if (__io_putchar(*_msg) != *_msg) {
+//             return *_msg;
+//         }
+//         _msg++;
+//     }
+//     return ' ';
+// }

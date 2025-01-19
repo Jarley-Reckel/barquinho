@@ -107,12 +107,12 @@ typedef struct {
     int sum;                    ///< Sum of the values
 } Moving_avg_t;
 
-/**
- * @brief Set the handler for the serial port
- * 
- * @param huart 
- */
-void init_serial(UART_HandleTypeDef *huart);
+// /**
+//  * @brief Set the handler for the serial port
+//  * 
+//  * @param huart 
+//  */
+// void init_serial(UART_HandleTypeDef *huart);
 
 
 // /**
@@ -123,13 +123,13 @@ void init_serial(UART_HandleTypeDef *huart);
 //  */
 // int __io_putchar(int ch);
 
-/**
- * @brief Function to print a message to the serial port
- *
- * @param _msg
- * @return char
- */
-char serial_print(char *_msg);
+// /**
+//  * @brief Function to print a message to the serial port
+//  *
+//  * @param _msg
+//  * @return char
+//  */
+// char serial_print(char *_msg);
 
 
 

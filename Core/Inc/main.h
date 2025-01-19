@@ -89,6 +89,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 int __io_putchar(int ch);
+char serial_print(char *_msg);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
