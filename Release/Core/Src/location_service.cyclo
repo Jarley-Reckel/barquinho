@@ -10,4 +10,4 @@
 ../Core/Src/location_service.c:184:8:rssi_to_distance	1
 ../Core/Src/location_service.c:188:8:get_device_distance	3
 ../Core/Src/location_service.c:197:5:get_device_rssi	3
-../Core/Src/location_service.c:206:6:update_boat_position	1
+../Core/Src/location_service.c:209:6:update_boat_position	1

@@ -195,7 +195,10 @@ double get_device_distance(Device *devices, int device_count, const char *device
 }
 
 int get_device_rssi(Device *devices, int device_count, const char *device_name) {
+    char *msg;
     for (int i = 0; i < device_count; ++i) {
+        sprintf(msg, "Device %d : %s == device_name: %s", i, devices[i].name, device_name);
+        serial_print(msg);
         if (strcmp(devices[i].name, device_name) == 0) {
             return devices[i].rssi;
         }
