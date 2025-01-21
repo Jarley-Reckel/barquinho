@@ -230,7 +230,7 @@ int main(void)
           if (bs.motor_speed > MOTOR_MIN_SPEED) {
             bs.motor_speed -= DESACELERATION;
             sendCommand(&bs, FORWARD, bs.motor_speed);
-            HAL_Delay(100);
+            HAL_Delay(10);
             continue;
           }
         }
