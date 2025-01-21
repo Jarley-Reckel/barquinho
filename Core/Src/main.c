@@ -114,8 +114,24 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
+  MX_GPIO_Init();
+  MX_I2C1_Init();
+  MX_TIM3_Init();
+  MX_TIM4_Init();
+  MX_USART2_UART_Init();
+  MX_USART3_UART_Init();
 
   /* USER CODE BEGIN SysInit */
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  /* USER CODE BEGIN 2 */
+
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   Boat_system_t bs;
   bs.name = "Barco_vermelho";
   bs.function = MASTER;
@@ -134,21 +150,11 @@ int main(void)
   bs.BLE_baud = BAUD_9600;
   bs.device_count = 0;
   bs.rssi_reference = -61;
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_I2C1_Init();
-  MX_TIM3_Init();
-  MX_TIM4_Init();
-  MX_USART2_UART_Init();
-  MX_USART3_UART_Init();
-  /* USER CODE BEGIN 2 */
-
   I2Cdev_init(&hi2c1);
   HMC5883L_initialize();
   BLE_setup(bs.BLE_huart, bs.name, bs.function, bs.BLE_baud);
   HMC5883L_testConnection();
+  HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
 
   char msg[RX_BUFFER_SIZE];
   double B1_distance;
@@ -161,11 +167,6 @@ int main(void)
 
   init_moving_average(&bs.rssi_avg);
   int media;
-
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
     sprintf(msg, "Inicializando Barco Vermelho!!\n");
     serial_print(msg);
     bs.motor_speed = MOTOR_MAX_SPEED;
