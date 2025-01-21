@@ -235,7 +235,7 @@ int main(void)
           }
         }
         update_servor_angle(&bs, B3_Y, B3_X, final_angle);
-        HAL_Delay(100);
+        HAL_Delay(10);
         continue;
       }
 
@@ -250,7 +250,7 @@ int main(void)
         limit = -1;
       }
       setServoAngle(&bs, DESTINY_DIRECTION);
-      HAL_Delay(1000);
+      HAL_Delay(10);
     }
   /* USER CODE END 3 */
 }
