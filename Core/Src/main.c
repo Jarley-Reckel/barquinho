@@ -154,7 +154,7 @@ int main(void)
   HMC5883L_initialize();
   BLE_setup(bs.BLE_huart, bs.name, bs.function, bs.BLE_baud);
   HMC5883L_testConnection();
-  HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
+  // HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
 
   char msg[RX_BUFFER_SIZE];
   double B1_distance;
@@ -180,9 +180,10 @@ int main(void)
     }
     setServoAngle(&bs, 90);
 
-    sprintf(msg, "Escanegando dispositivos!!\n");
+    sprintf(msg, "Escaneando dispositivos!!\n");
     serial_print(msg);
     // while (bs.device_count < 3) {
+    HAL_UART_Receive_IT(&huart3, &received_data, 1);
     BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
     HAL_Delay(100);
     // }
@@ -205,6 +206,13 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
       BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
+      // sprintf(msg, "\nBuffer: %s\n", rx_buffer);
+      // serial_print(msg);
+      // for(int i = 0; i < bs.device_count; i++) {
+      //   sprintf(msg, "\nDevice %d : %s||||", i, bs.devices[i].name);
+      //   serial_print(msg);
+      // }
+
       HMC588L_getDegree(&bs);
       B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", B1_RSSI_1M);
       B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", B2_RSSI_1M);
@@ -232,6 +240,8 @@ int main(void)
       }
 
       update_boat_position(&bs, B1_distance, B2_distance, B3_distance);
+      sprintf(msg, "\nX: %.2f \t Y: %.2f\n", bs.x_position, bs.y_position);
+      serial_print(msg);
       distance_x = abs(B1_X - bs.x_position);
       distance_y = abs(B1_Y - bs.y_position);
       update_servor_angle(&bs, aux_y, B3_X, (double)DESTINY_DIRECTION);

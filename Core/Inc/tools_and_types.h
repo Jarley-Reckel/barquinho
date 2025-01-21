@@ -22,19 +22,19 @@
 #define MAX_NAME_LEN 50         ///< Maximum length of the device name
 #define MAX_DEVICES 10          ///< Maximum number of devices
 #define MAX_MAC_LEN 13          ///< Maximum length of the MAC address
-#define B1_X -43.964666                 ///< X coordinate of device B1
-#define B1_Y -19.866733                  ///< Y coordinate of device B1
-#define B2_X -43.964556                 ///< X coordinate of device B2
-#define B2_Y -19.866425                  ///< Y coordinate of device B2
-#define B3_X -43.964556                 ///< X coordinate of device B3
-#define B3_Y -19.866572                  ///< Y coordinate of device B3
-#define DESTINY_X -43.964556                 ///< X coordinate of device B3
-#define DESTINY_DIRECTION 180                  ///< Angle of the destiny line
+#define B1_X -43.96169                 ///< X coordinate of device B1
+#define B1_Y -19.86944                 ///< Y coordinate of device B1
+#define B2_X -43.96167               ///< X coordinate of device B2
+#define B2_Y -19.86950                  ///< Y coordinate of device B2
+#define B3_X -43.96172                 ///< X coordinate of device B3
+#define B3_Y -19.86949                  ///< Y coordinate of device B3
+#define DESTINY_X -43.96167                  ///< X coordinate of device B3
+#define DESTINY_DIRECTION 130                  ///< Angle of the destiny line
 #define LIMIT_LINE_FACTOR 10
 #define HARD_LIMIT_FACTOR 12
-#define B1_RSSI_1M -61          ///< RSSI reference value at 1 meter for device B1
-#define B2_RSSI_1M -61          ///< RSSI reference value at 1 meter for device B2
-#define B3_RSSI_1M -61          ///< RSSI reference value at 1 meter for device B3
+#define B1_RSSI_1M -60          ///< RSSI reference value at 1 meter for device B1
+#define B2_RSSI_1M -58          ///< RSSI reference value at 1 meter for device B2
+#define B3_RSSI_1M -60          ///< RSSI reference value at 1 meter for device B3
 
 /**
  * @brief Enumeration of the possible functions of the JDY-18 module
