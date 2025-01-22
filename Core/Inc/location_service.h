@@ -111,7 +111,7 @@ int is_valid_mac(const char *mac);
  * @param rssi_1m   RSSI reference value at 1 meter
  * @return          Distance
  */
-double rssi_to_distance(int rssi, int A);
+double rssi_to_distance(int rssi, float Pt, float n);
 
 /**
  * @brief Function to find a device by name and calculate its distance

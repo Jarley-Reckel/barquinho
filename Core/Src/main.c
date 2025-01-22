@@ -135,6 +135,14 @@ int main(void)
     float ar_coeffs[AR_ORDER] = {0.7, -0.3, 0.2}; // Coeficientes AR
     float ma_coeffs[MA_ORDER] = {0.5, 0.3, 0.1};       // Coeficientes MA
 
+
+  ARMAFilter filter1;
+  ARMAFilter filter2;
+  ARMAFilter filter3;
+  init_arma_filter(&filter1, ar_coeffs, ma_coeffs, RSSI_B1_START);
+  init_arma_filter(&filter2, ar_coeffs, ma_coeffs, RSSI_B2_START);
+  init_arma_filter(&filter3, ar_coeffs, ma_coeffs, RSSI_B3_START);
+
   Boat_system_t bs;
   bs.name = "Barco_vermelho";
   bs.function = MASTER;
@@ -152,27 +160,27 @@ int main(void)
   bs.BLE_huart = &huart3;
   bs.BLE_baud = BAUD_9600;
   bs.device_count = 0;
-  strcpy(bs.devices[0].name,"PSE2022_B1");
-  strcpy(bs.devices[0].mac, " ");
-  bs.devices[0].rssi = RSSI_B1_START;
-  init_arma_filter(&bs.devices[0].filter, ar_coeffs, ma_coeffs, RSSI_B1_START);
-  strcpy(bs.devices[1].name,"PSE2022_B2");
-  strcpy(bs.devices[1].mac, " ");
-  bs.devices[1].rssi = RSSI_B2_START;
-  init_arma_filter(&bs.devices[1].filter, ar_coeffs, ma_coeffs, RSSI_B2_START);
-  strcpy(bs.devices[2].name,"PSE2022_B3");
-  strcpy(bs.devices[2].mac, " ");
-  bs.devices[2].rssi = RSSI_B3_START;
-  init_arma_filter(&bs.devices[2].filter, ar_coeffs, ma_coeffs, RSSI_B3_START);
+  // strcpy(bs.devices[0].name,"PSE2022_B1");
+  // strcpy(bs.devices[0].mac, " ");
+  // bs.devices[0].rssi = RSSI_B1_START;
+  // init_arma_filter(&bs.devices[0].filter, ar_coeffs, ma_coeffs, RSSI_B1_START);
+  // strcpy(bs.devices[1].name,"PSE2022_B2");
+  // strcpy(bs.devices[1].mac, " ");
+  // bs.devices[1].rssi = RSSI_B2_START;
+  // init_arma_filter(&bs.devices[1].filter, ar_coeffs, ma_coeffs, RSSI_B2_START);
+  // strcpy(bs.devices[2].name,"PSE2022_B3");
+  // strcpy(bs.devices[2].mac, " ");
+  // bs.devices[2].rssi = RSSI_B3_START;
+  // init_arma_filter(&bs.devices[2].filter, ar_coeffs, ma_coeffs, RSSI_B3_START);
   bs.rssi_reference = -61;
   char msg[RX_BUFFER_SIZE];
   I2Cdev_init(&hi2c1);
   HMC5883L_initialize();
   BLE_setup(bs.BLE_huart, bs.name, bs.function, bs.BLE_baud);
-  sprintf(msg, "Teste magnetometro: %d\n", (int)HMC5883L_testConnection());
+  // sprintf(msg, "Teste magnetometro: %d\n", (int)HMC5883L_testConnection());
   serial_print(msg);
   // HMC5883L_testConnection();
-  // HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
 
   double B1_distance;
   double B2_distance;
@@ -182,9 +190,9 @@ int main(void)
   int B3_rssi;
   int scan_id = 1;
 
-  init_moving_average(&bs.rssi_avg);
+  // init_moving_average(&bs.rssi_avg);
   int media;
-    sprintf(msg, "Inicializando Barco Vermelho!!\n");
+    // sprintf(msg, "Inicializando Barco Vermelho!!\n");
     serial_print(msg);
     bs.motor_speed = MOTOR_MAX_SPEED;
     for (int angle = 0; angle <= 180; angle += 10) {
@@ -197,7 +205,7 @@ int main(void)
     }
     setServoAngle(&bs, 90);
 
-    sprintf(msg, "Escaneando dispositivos!!\n");
+    // sprintf(msg, "Escaneando dispositivos!!\n");
     serial_print(msg);
     // while (bs.device_count < 3) {
     HAL_UART_Receive_IT(&huart3, &received_data, 1);
@@ -205,12 +213,12 @@ int main(void)
     HAL_Delay(100);
     // }
     for (int i = 0; i < bs.device_count; ++i) {
-      sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
+      // sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
       serial_print(msg);
     }
     
 
-    int16_t aux_y =  B3_Y + (B3_Y - B2_Y) / 2;
+    int16_t aux_y =  COORD_Y;
     int16_t limit = abs(B1_X - B2_X) / 2;
     int16_t limit_line = abs(B1_X - B2_X) / LIMIT_LINE_FACTOR;
     int16_t limit_hard = abs(B1_X - B2_X) / HARD_LIMIT_FACTOR;
@@ -225,23 +233,32 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
       BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
-      sprintf(msg, "\nBuffer: %s\n", rx_buffer);
+      // sprintf(msg, "\nBuffer: %s\n", rx_buffer);
       serial_print(msg);
       for(int i = 0; i < bs.device_count; i++) {
-        sprintf(msg, "\nDevice %d : %s||||", i, bs.devices[i].name);
+        // sprintf(msg, "\nDevice %d : %s||||", i, bs.devices[i].name);
         serial_print(msg);
       }
 
-      B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", B1_RSSI_1M);
-      B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", B2_RSSI_1M);
-      B3_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B3", B3_RSSI_1M);
       B1_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B1");
       B2_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B2");
       B3_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B3");
-      sprintf(msg, "\nB1 distance : %.2f \t B1 RSSI: %d\nB2 distance : %.2f \t B2 RSSI: %d\nB3 distance : %.2f \t B3 RSSI: %d\n", B1_distance, B1_rssi, B2_distance, B2_rssi, B3_distance, B3_rssi);
+      B1_rssi = apply_arma(&filter1, B1_rssi);
+      B2_rssi = apply_arma(&filter2, B2_rssi);
+      B3_rssi = apply_arma(&filter3, B3_rssi);
+      // bs.devices[0].rssi = B1_rssi;
+      // bs.devices[1].rssi = B2_rssi;
+      // bs.devices[2].rssi = B3_rssi;  
+      B1_distance = rssi_to_distance(B1_rssi, RSSI_Pt1, RSSI_n1);
+      B2_distance = rssi_to_distance(B2_rssi, RSSI_Pt2, RSSI_n2);
+      B3_distance = rssi_to_distance(B3_rssi, RSSI_Pt3, RSSI_n3);
+      // B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", B1_RSSI_1M);
+      // B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", B2_RSSI_1M);
+      // B3_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B3", B3_RSSI_1M);
+      // sprintf(msg, "\nB1 distance : %.2f \t B1 RSSI: %d\nB2 distance : %.2f \t B2 RSSI: %d\nB3 distance : %.2f \t B3 RSSI: %d\n", B1_distance, B1_rssi, B2_distance, B2_rssi, B3_distance, B3_rssi);
       serial_print(msg);
-      media = update_moving_average(&bs.rssi_avg, B1_rssi);
-      // sprintf(msg, "\nMedia %d \n", media);
+      // media = update_moving_average(&bs.rssi_avg, B1_rssi);
+      // // sprintf(msg, "\nMedia %d \n", media);
       // serial_print(msg);
 
 
@@ -261,20 +278,25 @@ int main(void)
 
       update_boat_position(&bs, B1_distance, B2_distance, B3_distance);
       HMC588L_getDegree(&bs);
-      sprintf(msg, "\nX: %.2f \t Y: %.2f Ang: %.2f Servor: %.2f\n", bs.x_position, bs.y_position, bs.heading, bs.servo_angle);
+      // sprintf(msg, "\nX: %.2f \t Y: %.2f Ang: %.2f Servor: %.2f\n", bs.x_position, bs.y_position, bs.heading, bs.servo_angle);
       serial_print(msg);
-      distance_x = abs(B1_X - bs.x_position);
+      // distance_x = abs(B1_X - bs.x_position);
       distance_y = abs(B1_Y - bs.y_position);
 
       // update_servor_angle(&bs, B2_Y, B2_X);
-      update_servor_angle(&bs, B3_Y, B3_X);
+
+      update_servor_angle(&bs, aux_y, B3_X);
       // setServoAngle(&bs, bs.servo_angle);
       // HAL_Delay(10);
+      if (distance_y < limit) {
+        aux_y = aux_y + (aux_y - B2_Y) / 2;
+        limit /= 2;
+      }
+      if (limit < limit_hard) {
+        limit = -1;
+        aux_y = B2_Y;
+      }
 
-      // if (distance_x < limit) {
-      //   aux_y = aux_y + (aux_y - B2_Y) / 2;
-      //   limit = -1;
-      // }
       // setServoAngle(&bs, DESTINY_DIRECTION);
       // HAL_Delay(10);
     }
@@ -587,12 +609,12 @@ int __io_putchar(int ch) {
 }
 
 char serial_print(char *_msg) {
-    while (*_msg) {
-        if (__io_putchar(*_msg) != *_msg) {
-            return *_msg;
-        }
-        _msg++;
-    }
+    // while (*_msg) {
+    //     if (__io_putchar(*_msg) != *_msg) {
+    //         return *_msg;
+    //     }
+    //     _msg++;
+    // }
     return ' ';
 }
 

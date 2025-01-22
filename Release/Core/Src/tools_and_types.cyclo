@@ -1,2 +1,5 @@
 ../Core/Src/tools_and_types.c:37:7:sub	3
 ../Core/Src/tools_and_types.c:47:7:sum	3
+../Core/Src/tools_and_types.c:60:6:init_arma_filter	1
+../Core/Src/tools_and_types.c:72:7:apply_ewma	1
+../Core/Src/tools_and_types.c:77:7:apply_arma	1

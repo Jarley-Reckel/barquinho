@@ -197,23 +197,23 @@ int is_valid_mac(const char *mac) {
     return 1;
 }
 
-double rssi_to_distance(int rssi, int rssi_1m) {
-    return pow(10, (double)(rssi_1m - rssi) / (10 * 2.5));
+double rssi_to_distance(int rssi, float Pt, float n) {
+    return pow(10, (double)(Pt - rssi) / (10 * n));
 }
 
 double get_device_distance(Device *devices, int device_count, const char *device_name, int rssi_1m) {
-    for (int i = 0; i < device_count; ++i) {
-        if (strstr(devices[i].name, device_name)) {
-            return rssi_to_distance(devices[i].rssi, rssi_1m);
-        }
-    }
-    return -1;
+    // for (int i = 0; i < device_count; ++i) {
+    //     if (strstr(devices[i].name, device_name)) {
+    //         return rssi_to_distance(devices[i].rssi, rssi_1m);
+    //     }
+    // }
+    // return -1;
 }
 
 int get_device_rssi(Device *devices, int device_count, const char *device_name) {
     char *msg;
     for (int i = 0; i < device_count; ++i) {
-        sprintf(msg, "Device %d : %s == device_name: %s", i, devices[i].name, device_name);
+        // sprintf(msg, "Device %d : %s == device_name: %s", i, devices[i].name, device_name);
         serial_print(msg);
         if (strstr(devices[i].name, device_name)) {
             return devices[i].rssi;

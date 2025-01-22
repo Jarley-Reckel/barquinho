@@ -143,7 +143,7 @@ void update_servor_angle(Boat_system_t *boat_system, float destiny_y, float dest
     float serve_angle = 180 - (sum(beta, theta) + 180)/2.0;
 
     char msmm[100];
-    sprintf(msmm, "\nTheta: %.2f\nAlpha: %.2f\nBeta: %.2f\nServo: %.2f\n", theta, alpha, beta, serve_angle);
+    // sprintf(msmm, "\nTheta: %.2f\nAlpha: %.2f\nBeta: %.2f\nServo: %.2f\n", theta, alpha, beta, serve_angle);
     serial_print(msmm);
     setServoAngle(boat_system, serve_angle);
     // if (abs(new_angle - angle) < abs(current_angle - angle)) {

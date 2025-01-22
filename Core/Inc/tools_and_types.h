@@ -29,6 +29,8 @@
 #define B3_Y -19.866425                  ///< Y coordinate of device B2
 #define B2_X -43.964556                 ///< X coordinate of device B3
 #define B2_Y -19.866572                  ///< Y coordinate of device B3
+#define COORD_X -43.964556                 ///< X coordinate of device B3
+#define COORD_Y 19.8664985                  ///< Y coordinate of device B3
 #define DESTINY_X -43.964556                 ///< X coordinate of device B3
 #define DESTINY_DIRECTION 180                  ///< Angle of the destiny line
 #define LIMIT_LINE_FACTOR 10
@@ -46,6 +48,12 @@
 #define ALPHA 0.3  // Constante do filtro exponencial (EWMA)
 #define AR_ORDER 3 // Ordem autoregressiva do ARMA
 #define MA_ORDER 3 // Ordem média móvel do ARMA
+#define RSSI_Pt1 -60.3
+#define RSSI_n1 2.0
+#define RSSI_Pt2 -60.3
+#define RSSI_n2 2.0
+#define RSSI_Pt3 -60.3
+#define RSSI_n3 2.0
 
 // Buffer para armazenar valores filtrados
 #define BUFFER_SIZE 10
@@ -88,6 +96,13 @@ typedef enum {
     // Adicionar comandos
 } AtCommands_t;
 
+typedef struct {
+    float ar_coeffs[AR_ORDER]; // Coeficientes AR
+    float ma_coeffs[MA_ORDER]; // Coeficientes MA
+    float past_rssi[AR_ORDER]; // Valores anteriores de RSSI
+    float past_errors[MA_ORDER]; // Erros passados
+} ARMAFilter;
+
 /**
  * @brief Structure to store the information of a device
  * 
@@ -126,13 +141,6 @@ typedef struct {
 float sub(float a, float b);
 float sum(float a, float b);
 
-
-typedef struct {
-    float ar_coeffs[AR_ORDER]; // Coeficientes AR
-    float ma_coeffs[MA_ORDER]; // Coeficientes MA
-    float past_rssi[AR_ORDER]; // Valores anteriores de RSSI
-    float past_errors[MA_ORDER]; // Erros passados
-} ARMAFilter;
 
 void init_arma_filter(ARMAFilter *filter, float *ar_coeffs, float *ma_coeffs, float initial_rssi);
 
