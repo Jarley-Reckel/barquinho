@@ -33,3 +33,21 @@
 //     }
 //     return ' ';
 // }
+
+float sub(float a, float b) {
+    float s = a - b;
+    if(s < -180) {
+        s += 360;
+    } else if(s > 180) {
+        s -= 360;
+    }
+}
+
+float sum(float a, float b) {
+    float s = a + b;
+    if(s < -180) {
+        s += 360;
+    } else if(s > 180) {
+        s -= 360;
+    }
+}

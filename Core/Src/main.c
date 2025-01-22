@@ -150,13 +150,15 @@ int main(void)
   bs.BLE_baud = BAUD_9600;
   bs.device_count = 0;
   bs.rssi_reference = -61;
+  char msg[RX_BUFFER_SIZE];
   I2Cdev_init(&hi2c1);
   HMC5883L_initialize();
   BLE_setup(bs.BLE_huart, bs.name, bs.function, bs.BLE_baud);
-  HMC5883L_testConnection();
+  sprintf(msg, "Teste magnetometro: %d\n", (int)HMC5883L_testConnection());
+  serial_print(msg);
+  // HMC5883L_testConnection();
   // HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
 
-  char msg[RX_BUFFER_SIZE];
   double B1_distance;
   double B2_distance;
   double B3_distance;
@@ -205,6 +207,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+      double a = atan2(-1,0);
+      sprintf(msg, "\nAngle: %.2f\n", a * (180.0 / PI));
+      serial_print(msg);
       BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
       // sprintf(msg, "\nBuffer: %s\n", rx_buffer);
       // serial_print(msg);
@@ -213,7 +219,6 @@ int main(void)
       //   serial_print(msg);
       // }
 
-      HMC588L_getDegree(&bs);
       B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", B1_RSSI_1M);
       B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", B2_RSSI_1M);
       B3_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B3", B3_RSSI_1M);
@@ -225,32 +230,39 @@ int main(void)
       media = update_moving_average(&bs.rssi_avg, B1_rssi);
       sprintf(msg, "\nMedia %d \n", media);
       serial_print(msg);
-      if (distance_y < limit_line) {
-        if(B2_distance < limit_hard) {
-          if (bs.motor_speed > MOTOR_MIN_SPEED) {
-            bs.motor_speed -= DESACELERATION;
-            sendCommand(&bs, FORWARD, bs.motor_speed);
-            HAL_Delay(10);
-            continue;
-          }
-        }
-        update_servor_angle(&bs, B3_Y, B3_X, final_angle);
-        HAL_Delay(10);
-        continue;
-      }
+
+
+      // if (distance_y < limit_line) {
+      //   if(B2_distance < limit_hard) {
+      //     if (bs.motor_speed > MOTOR_MIN_SPEED) {
+      //       bs.motor_speed -= DESACELERATION;
+      //       sendCommand(&bs, FORWARD, bs.motor_speed);
+      //       HAL_Delay(10);
+      //       continue;
+      //     }
+      //   }
+      //   update_servor_angle(&bs, B3_Y, B3_X, final_angle);
+      //   HAL_Delay(10);
+      //   continue;
+      // }
 
       update_boat_position(&bs, B1_distance, B2_distance, B3_distance);
-      sprintf(msg, "\nX: %.2f \t Y: %.2f\n", bs.x_position, bs.y_position);
+      HMC588L_getDegree(&bs);
+      sprintf(msg, "\nX: %.2f \t Y: %.2f\n Ang: %.2f", bs.x_position, bs.y_position,bs.heading);
       serial_print(msg);
       distance_x = abs(B1_X - bs.x_position);
       distance_y = abs(B1_Y - bs.y_position);
-      update_servor_angle(&bs, aux_y, B3_X, (double)DESTINY_DIRECTION);
-      if (distance_x < limit) {
-        aux_y = aux_y + (aux_y - B2_Y) / 2;
-        limit = -1;
-      }
-      setServoAngle(&bs, DESTINY_DIRECTION);
+
+      update_servor_angle(&bs, B2_Y, B2_X);
+      // setServoAngle(&bs, bs.servo_angle);
       HAL_Delay(10);
+
+      // if (distance_x < limit) {
+      //   aux_y = aux_y + (aux_y - B2_Y) / 2;
+      //   limit = -1;
+      // }
+      // setServoAngle(&bs, DESTINY_DIRECTION);
+      // HAL_Delay(10);
     }
   /* USER CODE END 3 */
 }

@@ -107,6 +107,9 @@ typedef struct {
     int sum;                    ///< Sum of the values
 } Moving_avg_t;
 
+float sub(float a, float b);
+float sum(float a, float b);
+
 // /**
 //  * @brief Set the handler for the serial port
 //  * 

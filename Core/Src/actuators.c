@@ -130,16 +130,22 @@ void sendCommand(Boat_system_t *boat_system, unsigned char value, int speed) {
  * O parâmetro pass representa o incremento do ângulo do servo, se pass = 1, o incremento é grosseiro,
  * se pass = 0, o incremento é fino. Isso é definito pela distância entre o barco e a chegada.
  */
-void update_servor_angle(Boat_system_t *boat_system, int16_t destiny_y, int16_t destiny_x, double angle) {
-    int16_t current_angle = boat_system_get_servo_angle(boat_system);
-    int16_t boat_x = boat_system_get_x_position(boat_system);
-    int16_t boat_y = boat_system_get_y_position(boat_system);
+void update_servor_angle(Boat_system_t *boat_system, float destiny_y, float destiny_x) {
+    // int16_t current_angle = boat_system_get_servo_angle(boat_system);
+    float boat_x = boat_system_get_x_position(boat_system);
+    float boat_y = boat_system_get_y_position(boat_system);
+    float theta = boat_system_get_heading(boat_system);
 
-    int16_t new_angle = atan2(destiny_y - boat_y, destiny_x - boat_x) * 180 / PI;
-    if (abs(new_angle - angle) < abs(current_angle - angle)) {
-        setServoAngle(boat_system, new_angle);
-    } else {
-        // Tratar caso que o barco desvia de se ajustar para o sul
-        setServoAngle(boat_system, angle);
-    }
+
+    // float new_angle = atan2(destiny_y - boat_y, destiny_x - boat_x) * 180 / PI;
+    float alpha = atan2f(destiny_x - boat_x, destiny_y - boat_y) * 180 / PI;
+    float beta = sub(180, alpha);
+    float serve_angle = sum(sum(beta, theta), 180)/2;
+    setServoAngle(boat_system, serve_angle);
+    // if (abs(new_angle - angle) < abs(current_angle - angle)) {
+    //     setServoAngle(boat_system, new_angle);
+    // } else {
+    //     // Tratar caso que o barco desvia de se ajustar para o sul
+    //     setServoAngle(boat_system, angle);
+    // }
 }
