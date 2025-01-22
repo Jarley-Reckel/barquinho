@@ -153,11 +153,11 @@ int main(void)
   char msg[RX_BUFFER_SIZE];
   I2Cdev_init(&hi2c1);
   HMC5883L_initialize();
-  BLE_setup(bs.BLE_huart, bs.name, bs.function, bs.BLE_baud);
-  sprintf(msg, "Teste magnetometro: %d\n", (int)HMC5883L_testConnection());
-  serial_print(msg);
+  // BLE_setup(bs.BLE_huart, bs.name, bs.function, bs.BLE_baud);
+  // sprintf(msg, "Teste magnetometro: %d\n", (int)HMC5883L_testConnection());
+  // serial_print(msg);
   // HMC5883L_testConnection();
-  // HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
+  //HAL_GPIO_WritePin(GPIOA, L293D_EN_Pin, GPIO_PIN_RESET);
 
   double B1_distance;
   double B2_distance;
@@ -169,8 +169,8 @@ int main(void)
 
   init_moving_average(&bs.rssi_avg);
   int media;
-    sprintf(msg, "Inicializando Barco Vermelho!!\n");
-    serial_print(msg);
+    // sprintf(msg, "Inicializando Barco Vermelho!!\n");
+    // serial_print(msg);
     bs.motor_speed = MOTOR_MAX_SPEED;
     for (int angle = 0; angle <= 180; angle += 10) {
       setServoAngle(&bs, angle);
@@ -182,17 +182,17 @@ int main(void)
     }
     setServoAngle(&bs, 90);
 
-    sprintf(msg, "Escaneando dispositivos!!\n");
-    serial_print(msg);
+    // sprintf(msg, "Escaneando dispositivos!!\n");
+    // serial_print(msg);
     // while (bs.device_count < 3) {
     HAL_UART_Receive_IT(&huart3, &received_data, 1);
-    BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
-    HAL_Delay(100);
+    // BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
+    // HAL_Delay(100);
+    // // }
+    // for (int i = 0; i < bs.device_count; ++i) {
+    //   sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
+    //   serial_print(msg);
     // }
-    for (int i = 0; i < bs.device_count; ++i) {
-      sprintf(msg, "\nDevice %d : %s", i, bs.devices[i].name);
-      serial_print(msg);
-    }
     
 
     int16_t aux_y =  B3_Y + (B3_Y - B2_Y) / 2;
@@ -203,66 +203,43 @@ int main(void)
     int16_t distance_y = 0;
     double final_angle = atan2(B3_Y - B2_Y, B3_X - B2_X) * (180.0 / PI);
     sendCommand(&bs, FORWARD, MOTOR_MAX_SPEED);
+    int16_t south = 180;
+    int16_t north = 0;
+    int16_t east = 90;
+    int16_t west = 270;
+    int16_t b1_b3 = 10;
+    int16_t ms_counter10 = 0;
+    float degree = 0;
     while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+      char msg[100];
       double a = atan2(-1,0);
-      sprintf(msg, "\nAngle: %.2f\n", a * (180.0 / PI));
-      serial_print(msg);
-      BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
-      // sprintf(msg, "\nBuffer: %s\n", rx_buffer);
+      // sprintf(msg, "\nAngle: %.2f\n", a * (180.0 / PI));
       // serial_print(msg);
-      // for(int i = 0; i < bs.device_count; i++) {
-      //   sprintf(msg, "\nDevice %d : %s||||", i, bs.devices[i].name);
-      //   serial_print(msg);
-      // }
-
-      B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", B1_RSSI_1M);
-      B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", B2_RSSI_1M);
-      B3_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B3", B3_RSSI_1M);
-      B1_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B1");
-      B2_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B2");
-      B3_rssi = get_device_rssi(bs.devices, bs.device_count,"PSE2022_B3");
-      sprintf(msg, "\nB1 distance : %.2f \t B1 RSSI: %d\nB2 distance : %.2f \t B2 RSSI: %d\nB3 distance : %.2f \t B3 RSSI: %d\n", B1_distance, B1_rssi, B2_distance, B2_rssi, B3_distance, B3_rssi);
-      serial_print(msg);
-      media = update_moving_average(&bs.rssi_avg, B1_rssi);
-      sprintf(msg, "\nMedia %d \n", media);
-      serial_print(msg);
-
-
-      // if (distance_y < limit_line) {
-      //   if(B2_distance < limit_hard) {
-      //     if (bs.motor_speed > MOTOR_MIN_SPEED) {
-      //       bs.motor_speed -= DESACELERATION;
-      //       sendCommand(&bs, FORWARD, bs.motor_speed);
-      //       HAL_Delay(10);
-      //       continue;
-      //     }
-      //   }
-      //   update_servor_angle(&bs, B3_Y, B3_X, final_angle);
-      //   HAL_Delay(10);
-      //   continue;
-      // }
-
-      update_boat_position(&bs, B1_distance, B2_distance, B3_distance);
-      HMC588L_getDegree(&bs);
-      sprintf(msg, "\nX: %.2f \t Y: %.2f\n Ang: %.2f", bs.x_position, bs.y_position,bs.heading);
-      serial_print(msg);
-      distance_x = abs(B1_X - bs.x_position);
-      distance_y = abs(B1_Y - bs.y_position);
-
-      update_servor_angle(&bs, B2_Y, B2_X);
-      // setServoAngle(&bs, bs.servo_angle);
+      if (ms_counter10 <= 500)
+      {
+        degree = HMC588L_getDegree(&bs,north); 
+      }
+      else if (500 < ms_counter10 && ms_counter10 <= 1000)
+      {
+        degree = HMC588L_getDegree(&bs,east);
+      }
+      else if (1000 < ms_counter10 && ms_counter10 <= 1500)
+      {
+        degree = HMC588L_getDegree(&bs,south);
+      }
+      else
+      {
+        degree = HMC588L_getDegree(&bs,west);
+      }
+            
+      int16_t servor_angle = (int16_t)((degree + 180)/2);
+      setServoAngle(&bs, servor_angle);
+      ++ms_counter10;
       HAL_Delay(10);
 
-      // if (distance_x < limit) {
-      //   aux_y = aux_y + (aux_y - B2_Y) / 2;
-      //   limit = -1;
-      // }
-      // setServoAngle(&bs, DESTINY_DIRECTION);
-      // HAL_Delay(10);
     }
   /* USER CODE END 3 */
 }

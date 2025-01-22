@@ -44,7 +44,7 @@ void BLE_setup(UART_HandleTypeDef *huartInt, char *name, Function_t device_funct
     BLE_send_command(AT_COMMAND_IAC, "");
     BLE_send_command(AT_COMMAND_RESET, "");
 
-    serial_print("hello world");
+    // serial_print("hello world");
 }
 
 void BLE_connect_Master_to_Slave_MAC (char *mac) {

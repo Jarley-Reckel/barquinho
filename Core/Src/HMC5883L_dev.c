@@ -360,14 +360,22 @@ uint8_t HMC5883L_getIDC() {
  * 
  * @return float 
  */
-float HMC588L_getDegree(Boat_system_t *boat_system) {
+float HMC588L_getDegree(Boat_system_t *boat_system, int16_t reference) {
     int16_t x, y;
     x = HMC5883L_getHeadingX();
     y = HMC5883L_getHeadingY();
     float heading = atan2f(y, x) * 180 / PI;
+    float angle;
     heading += DEGREE_CORRECTION;
     heading += MINUTE_CORRECTION / 60.0;
-    heading -= 90;
+    if (reference>= 180) {
+        angle = -90 - (reference-360);
+    }
+    else{
+        angle = - reference - 90;   
+    }
+
+    heading += angle;
     
     if (heading < -180) {
         heading += 360;
