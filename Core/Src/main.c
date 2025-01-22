@@ -132,6 +132,9 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+    float ar_coeffs[AR_ORDER] = {0.7, -0.3, 0.2}; // Coeficientes AR
+    float ma_coeffs[MA_ORDER] = {0.5, 0.3, 0.1};       // Coeficientes MA
+
   Boat_system_t bs;
   bs.name = "Barco_vermelho";
   bs.function = MASTER;
@@ -149,6 +152,18 @@ int main(void)
   bs.BLE_huart = &huart3;
   bs.BLE_baud = BAUD_9600;
   bs.device_count = 0;
+  strcpy(bs.devices[0].name,"PSE2022_B1");
+  strcpy(bs.devices[0].mac, " ");
+  bs.devices[0].rssi = RSSI_B1_START;
+  init_arma_filter(&bs.devices[0].filter, ar_coeffs, ma_coeffs, RSSI_B1_START);
+  strcpy(bs.devices[1].name,"PSE2022_B2");
+  strcpy(bs.devices[1].mac, " ");
+  bs.devices[1].rssi = RSSI_B2_START;
+  init_arma_filter(&bs.devices[1].filter, ar_coeffs, ma_coeffs, RSSI_B2_START);
+  strcpy(bs.devices[2].name,"PSE2022_B3");
+  strcpy(bs.devices[2].mac, " ");
+  bs.devices[2].rssi = RSSI_B3_START;
+  init_arma_filter(&bs.devices[2].filter, ar_coeffs, ma_coeffs, RSSI_B3_START);
   bs.rssi_reference = -61;
   char msg[RX_BUFFER_SIZE];
   I2Cdev_init(&hi2c1);
@@ -203,21 +218,19 @@ int main(void)
     int16_t distance_y = 0;
     double final_angle = atan2(B3_Y - B2_Y, B3_X - B2_X) * (180.0 / PI);
     sendCommand(&bs, FORWARD, MOTOR_MAX_SPEED);
+
+
     while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-      double a = atan2(-1,0);
-      sprintf(msg, "\nAngle: %.2f\n", a * (180.0 / PI));
-      serial_print(msg);
       BLE_scan(bs.devices, &bs.device_count, scan_id, msg);
-      // sprintf(msg, "\nBuffer: %s\n", rx_buffer);
-      // serial_print(msg);
-      // for(int i = 0; i < bs.device_count; i++) {
-      //   sprintf(msg, "\nDevice %d : %s||||", i, bs.devices[i].name);
-      //   serial_print(msg);
-      // }
+      sprintf(msg, "\nBuffer: %s\n", rx_buffer);
+      serial_print(msg);
+      for(int i = 0; i < bs.device_count; i++) {
+        sprintf(msg, "\nDevice %d : %s||||", i, bs.devices[i].name);
+        serial_print(msg);
+      }
 
       B1_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B1", B1_RSSI_1M);
       B2_distance = get_device_distance(bs.devices, bs.device_count, "PSE2022_B2", B2_RSSI_1M);
@@ -228,8 +241,8 @@ int main(void)
       sprintf(msg, "\nB1 distance : %.2f \t B1 RSSI: %d\nB2 distance : %.2f \t B2 RSSI: %d\nB3 distance : %.2f \t B3 RSSI: %d\n", B1_distance, B1_rssi, B2_distance, B2_rssi, B3_distance, B3_rssi);
       serial_print(msg);
       media = update_moving_average(&bs.rssi_avg, B1_rssi);
-      sprintf(msg, "\nMedia %d \n", media);
-      serial_print(msg);
+      // sprintf(msg, "\nMedia %d \n", media);
+      // serial_print(msg);
 
 
       // if (distance_y < limit_line) {
@@ -248,14 +261,15 @@ int main(void)
 
       update_boat_position(&bs, B1_distance, B2_distance, B3_distance);
       HMC588L_getDegree(&bs);
-      sprintf(msg, "\nX: %.2f \t Y: %.2f\n Ang: %.2f", bs.x_position, bs.y_position,bs.heading);
+      sprintf(msg, "\nX: %.2f \t Y: %.2f Ang: %.2f Servor: %.2f\n", bs.x_position, bs.y_position, bs.heading, bs.servo_angle);
       serial_print(msg);
       distance_x = abs(B1_X - bs.x_position);
       distance_y = abs(B1_Y - bs.y_position);
 
-      update_servor_angle(&bs, B2_Y, B2_X);
+      // update_servor_angle(&bs, B2_Y, B2_X);
+      update_servor_angle(&bs, B3_Y, B3_X);
       // setServoAngle(&bs, bs.servo_angle);
-      HAL_Delay(10);
+      // HAL_Delay(10);
 
       // if (distance_x < limit) {
       //   aux_y = aux_y + (aux_y - B2_Y) / 2;
@@ -595,7 +609,7 @@ void scan()
 {
 	char command[] = "AT+INQ\r\n";
     HAL_UART_Transmit(&huart3, (uint8_t *)command, strlen(command), HAL_MAX_DELAY);
-    HAL_Delay(1000); // Ensure sufficient time for command execution
+    HAL_Delay(300); // Ensure sufficient time for command execution
 }
 
 

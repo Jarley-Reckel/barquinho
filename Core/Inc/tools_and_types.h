@@ -15,6 +15,7 @@
 #define __DEFINES__H__
 
 #include <stdint.h>
+#include <math.h>
 #include "stm32f4xx_hal.h"
 
 #define AVG_WINDOW 10           ///< Window size for the moving average
@@ -22,19 +23,33 @@
 #define MAX_NAME_LEN 50         ///< Maximum length of the device name
 #define MAX_DEVICES 10          ///< Maximum number of devices
 #define MAX_MAC_LEN 13          ///< Maximum length of the MAC address
-#define B1_X -43.96169                 ///< X coordinate of device B1
-#define B1_Y -19.86944                 ///< Y coordinate of device B1
-#define B2_X -43.96167               ///< X coordinate of device B2
-#define B2_Y -19.86950                  ///< Y coordinate of device B2
-#define B3_X -43.96172                 ///< X coordinate of device B3
-#define B3_Y -19.86949                  ///< Y coordinate of device B3
-#define DESTINY_X -43.96167                  ///< X coordinate of device B3
-#define DESTINY_DIRECTION 130                  ///< Angle of the destiny line
+#define B1_X -43.964666                 ///< X coordinate of device B1
+#define B1_Y -19.866733                  ///< Y coordinate of device B1
+#define B3_X -43.964556                 ///< X coordinate of device B2
+#define B3_Y -19.866425                  ///< Y coordinate of device B2
+#define B2_X -43.964556                 ///< X coordinate of device B3
+#define B2_Y -19.866572                  ///< Y coordinate of device B3
+#define DESTINY_X -43.964556                 ///< X coordinate of device B3
+#define DESTINY_DIRECTION 180                  ///< Angle of the destiny line
 #define LIMIT_LINE_FACTOR 10
 #define HARD_LIMIT_FACTOR 12
 #define B1_RSSI_1M -60          ///< RSSI reference value at 1 meter for device B1
-#define B2_RSSI_1M -58          ///< RSSI reference value at 1 meter for device B2
+#define B2_RSSI_1M -60          ///< RSSI reference value at 1 meter for device B2
 #define B3_RSSI_1M -60          ///< RSSI reference value at 1 meter for device B3
+#define RSSI_B1_START -1
+#define RSSI_B2_START -1
+#define RSSI_B3_START -1
+#define RSSI_B1_midle -1
+#define RSSI_B2_midle -1
+#define RSSI_B3_midle -1
+
+#define ALPHA 0.3  // Constante do filtro exponencial (EWMA)
+#define AR_ORDER 3 // Ordem autoregressiva do ARMA
+#define MA_ORDER 3 // Ordem média móvel do ARMA
+
+// Buffer para armazenar valores filtrados
+#define BUFFER_SIZE 10
+
 
 /**
  * @brief Enumeration of the possible functions of the JDY-18 module
@@ -82,6 +97,7 @@ typedef struct {
     int rssi;                   ///< Received Signal Strength Indicator
     int last_scan_id;           ///< Last scan ID where the device was found
     char name[MAX_NAME_LEN];    ///< Name of the device
+    ARMAFilter filter;          ///< Filter for the RSSI values
 } Device;
 
 /**
@@ -109,6 +125,20 @@ typedef struct {
 
 float sub(float a, float b);
 float sum(float a, float b);
+
+
+typedef struct {
+    float ar_coeffs[AR_ORDER]; // Coeficientes AR
+    float ma_coeffs[MA_ORDER]; // Coeficientes MA
+    float past_rssi[AR_ORDER]; // Valores anteriores de RSSI
+    float past_errors[MA_ORDER]; // Erros passados
+} ARMAFilter;
+
+void init_arma_filter(ARMAFilter *filter, float *ar_coeffs, float *ma_coeffs, float initial_rssi);
+
+float apply_ewma(float new_rssi, float prev_filtered_rssi);
+
+float apply_arma(ARMAFilter *filter, float new_rssi);
 
 // /**
 //  * @brief Set the handler for the serial port

@@ -146,6 +146,22 @@ void parse_devices(const char *input, Device *devices, int *device_count, int sc
         strncpy(name, current, name_end - current);
         name[name_end - current] = '\0';
 
+        // if (strstr(name, "PSE2022_B1")) {
+        //     devices[0].last_scan_id = scan_id;
+        //     strcpy(devices[0].mac, mac);
+        //     devices[0].rssi = rssi;
+        // }
+        // if (strstr(name, "PSE2022_B2")) {
+        //     devices[1].last_scan_id = scan_id;
+        //     strcpy(devices[1].mac, mac);
+        //     devices[1].rssi = rssi;
+        // }
+        // if (strstr(name, "PSE2022_B3")) {
+        //     devices[2].last_scan_id = scan_id;
+        //     strcpy(devices[2].mac, mac);
+        //     devices[2].rssi = rssi;
+        // }
+
         // Check duplicate MAC
         int index = find_device_index(devices, *device_count, mac);
         if (index != -1) {
@@ -182,7 +198,7 @@ int is_valid_mac(const char *mac) {
 }
 
 double rssi_to_distance(int rssi, int rssi_1m) {
-    return pow(10, (double)(rssi_1m - rssi) / (10 * 2));
+    return pow(10, (double)(rssi_1m - rssi) / (10 * 2.5));
 }
 
 double get_device_distance(Device *devices, int device_count, const char *device_name, int rssi_1m) {

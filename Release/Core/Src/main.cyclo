@@ -1,8 +1,8 @@
-../Core/Src/main.c:274:6:SystemClock_Config	3
-../Core/Src/main.c:570:5:__io_putchar	1
-../Core/Src/main.c:575:6:serial_print	3
-../Core/Src/main.c:585:6:HAL_UART_RxCpltCallback	2
-../Core/Src/main.c:594:6:scan	1
-../Core/Src/main.c:555:6:BLE_scan	2
-../Core/Src/main.c:99:5:main	13
-../Core/Src/main.c:608:6:Error_Handler	1
+../Core/Src/main.c:280:6:SystemClock_Config	3
+../Core/Src/main.c:576:5:__io_putchar	1
+../Core/Src/main.c:581:6:serial_print	3
+../Core/Src/main.c:591:6:HAL_UART_RxCpltCallback	2
+../Core/Src/main.c:600:6:scan	1
+../Core/Src/main.c:561:6:BLE_scan	2
+../Core/Src/main.c:99:5:main	14
+../Core/Src/main.c:614:6:Error_Handler	1

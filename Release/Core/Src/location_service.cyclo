@@ -5,9 +5,9 @@
 ../Core/Src/location_service.c:78:5:update_moving_average	1
 ../Core/Src/location_service.c:86:5:find_device_index	3
 ../Core/Src/location_service.c:95:5:calculate_average_rssi	2
-../Core/Src/location_service.c:172:5:is_valid_mac	4
+../Core/Src/location_service.c:188:5:is_valid_mac	4
 ../Core/Src/location_service.c:99:6:parse_devices	11
-../Core/Src/location_service.c:184:8:rssi_to_distance	1
-../Core/Src/location_service.c:188:8:get_device_distance	3
-../Core/Src/location_service.c:197:5:get_device_rssi	3
-../Core/Src/location_service.c:209:6:update_boat_position	1
+../Core/Src/location_service.c:200:8:rssi_to_distance	1
+../Core/Src/location_service.c:204:8:get_device_distance	3
+../Core/Src/location_service.c:213:5:get_device_rssi	3
+../Core/Src/location_service.c:225:6:update_boat_position	1

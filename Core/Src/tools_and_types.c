@@ -41,6 +41,7 @@ float sub(float a, float b) {
     } else if(s > 180) {
         s -= 360;
     }
+    return s;
 }
 
 float sum(float a, float b) {
@@ -50,4 +51,56 @@ float sum(float a, float b) {
     } else if(s > 180) {
         s -= 360;
     }
+    return s;
+}
+
+// Estrutura para armazenar estados do filtro ARMA
+
+// Inicializa o filtro ARMA
+void init_arma_filter(ARMAFilter *filter, float *ar_coeffs, float *ma_coeffs, float initial_rssi) {
+    for (int i = 0; i < AR_ORDER; i++) {
+        filter->ar_coeffs[i] = ar_coeffs[i];
+        filter->past_rssi[i] = initial_rssi;
+    }
+    for (int i = 0; i < MA_ORDER; i++) {
+        filter->ma_coeffs[i] = ma_coeffs[i];
+        filter->past_errors[i] = 0.0f;
+    }
+}
+
+// Aplica o filtro exponencial (EWMA)
+float apply_ewma(float new_rssi, float prev_filtered_rssi) {
+    return ALPHA * new_rssi + (1 - ALPHA) * prev_filtered_rssi;
+}
+
+// Aplica o filtro ARMA
+float apply_arma(ARMAFilter *filter, float new_rssi) {
+    // Calcula a parte AR (autoregressiva)
+    float ar_part = 0.0f;
+    for (int i = 0; i < AR_ORDER; i++) {
+        ar_part += filter->ar_coeffs[i] * filter->past_rssi[i];
+    }
+
+    // Calcula a parte MA (média móvel)
+    float ma_part = 0.0f;
+    for (int i = 0; i < MA_ORDER; i++) {
+        ma_part += filter->ma_coeffs[i] * filter->past_errors[i];
+    }
+
+    // Calcula o erro atual
+    float error = new_rssi - ar_part;
+
+    // Atualiza os buffers
+    for (int i = AR_ORDER - 1; i > 0; i--) {
+        filter->past_rssi[i] = filter->past_rssi[i - 1];
+    }
+    filter->past_rssi[0] = new_rssi;
+
+    for (int i = MA_ORDER - 1; i > 0; i--) {
+        filter->past_errors[i] = filter->past_errors[i - 1];
+    }
+    filter->past_errors[0] = error;
+
+    // Retorna o valor filtrado
+    return ar_part + ma_part;
 }
