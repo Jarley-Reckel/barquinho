@@ -73,10 +73,10 @@ file_paths = [
     'calibracao\data3.csv',  # Arquivo para 3 metros
     'calibracao\data5.csv',  # Arquivo para 5 metros
     'calibracao\data10.csv',  # Arquivo para 10 metros
-    'calibracao\data20.csv'   # Arquivo para 20 metros
+    'calibracao\data05.csv'   # Arquivo para 20 metros
 ]
 
-distances = [1, 3, 5, 10, 20]
+distances = [0.5, 1, 3, 5, 10]
 rssi_values = []
 
 # Carregar RSSI de cada arquivo

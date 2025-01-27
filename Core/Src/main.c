@@ -132,16 +132,22 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    float ar_coeffs[AR_ORDER] = {0.7, -0.3, 0.2}; // Coeficientes AR
-    float ma_coeffs[MA_ORDER] = {0.5, 0.3, 0.1};       // Coeficientes MA
+    float ar_coeffs1[AR_ORDER] = {0.67348657, 0.65200555, -0.99137748}; // Coeficientes AR
+    float ma_coeffs1[MA_ORDER] = {-0.77182165, -0.78036989, 0.9870511};       // Coeficientes MA
+    
+    float ar_coeffs2[AR_ORDER] = {-1.87264865, -1.87290948, -0.99750545}; // Coeficientes AR
+    float ma_coeffs2[MA_ORDER] = {-2.01837249, 1.50346126, -0.4728638};       // Coeficientes MA
+    
+    float ar_coeffs3[AR_ORDER] = {0.55748207, 0.55602423, -0.9994292}; // Coeficientes AR
+    float ma_coeffs3[MA_ORDER] = {-2.08654653, 2.08560746, -0.99905818};       // Coeficientes MA
 
 
   ARMAFilter filter1;
   ARMAFilter filter2;
   ARMAFilter filter3;
-  init_arma_filter(&filter1, ar_coeffs, ma_coeffs, RSSI_B1_START);
-  init_arma_filter(&filter2, ar_coeffs, ma_coeffs, RSSI_B2_START);
-  init_arma_filter(&filter3, ar_coeffs, ma_coeffs, RSSI_B3_START);
+  init_arma_filter(&filter1, ar_coeffs1, ma_coeffs1, RSSI_B1_START);
+  init_arma_filter(&filter2, ar_coeffs2, ma_coeffs2, RSSI_B2_START);
+  init_arma_filter(&filter3, ar_coeffs3, ma_coeffs3, RSSI_B3_START);
 
   Boat_system_t bs;
   bs.name = "Barco_vermelho";
@@ -285,17 +291,17 @@ int main(void)
 
       // update_servor_angle(&bs, B2_Y, B2_X);
 
-      update_servor_angle(&bs, aux_y, B3_X);
+      update_servor_angle(&bs, B3_X, B3_X);
       // setServoAngle(&bs, bs.servo_angle);
       // HAL_Delay(10);
       if (distance_y < limit) {
-        aux_y = aux_y + (aux_y - B2_Y) / 2;
-        limit /= 2;
-      }
-      if (limit < limit_hard) {
-        limit = -1;
         aux_y = B2_Y;
+        limit = -1;
       }
+      // if (limit < limit_hard) {
+      //   limit = -1;
+      //   aux_y = B2_Y;
+      // }
 
       // setServoAngle(&bs, DESTINY_DIRECTION);
       // HAL_Delay(10);

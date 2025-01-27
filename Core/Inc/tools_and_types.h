@@ -35,25 +35,25 @@
 #define DESTINY_DIRECTION 180                  ///< Angle of the destiny line
 #define LIMIT_LINE_FACTOR 10
 #define HARD_LIMIT_FACTOR 12
-#define B1_RSSI_1M -60          ///< RSSI reference value at 1 meter for device B1
-#define B2_RSSI_1M -60          ///< RSSI reference value at 1 meter for device B2
-#define B3_RSSI_1M -60          ///< RSSI reference value at 1 meter for device B3
+#define B1_RSSI_1M -53.17          ///< RSSI reference value at 1 meter for device B1
+#define B2_RSSI_1M -74.11          ///< RSSI reference value at 1 meter for device B2
+#define B3_RSSI_1M -76.53          ///< RSSI reference value at 1 meter for device B3
 #define RSSI_B1_START -1
-#define RSSI_B2_START -1
-#define RSSI_B3_START -1
+#define RSSI_B2_START -95
+#define RSSI_B3_START -85
 #define RSSI_B1_midle -1
-#define RSSI_B2_midle -1
-#define RSSI_B3_midle -1
+#define RSSI_B2_midle -85
+#define RSSI_B3_midle -75
 
 #define ALPHA 0.3  // Constante do filtro exponencial (EWMA)
 #define AR_ORDER 3 // Ordem autoregressiva do ARMA
 #define MA_ORDER 3 // Ordem média móvel do ARMA
-#define RSSI_Pt1 -60.3
-#define RSSI_n1 2.0
-#define RSSI_Pt2 -60.3
+#define RSSI_Pt1 -53.17
+#define RSSI_n1 1.7
+#define RSSI_Pt2 -74.11
 #define RSSI_n2 2.0
-#define RSSI_Pt3 -60.3
-#define RSSI_n3 2.0
+#define RSSI_Pt3 -76.53
+#define RSSI_n3 1.25
 
 // Buffer para armazenar valores filtrados
 #define BUFFER_SIZE 10

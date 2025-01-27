@@ -22,8 +22,8 @@
  * 
  */
 typedef enum direction {
-    FORWARD = 0b10101100,
-    BACKWARD = 0b01010011
+    BACKWARD = 0b10101100,
+    FORWARD = 0b01010011
 } direction;
 
 /**
